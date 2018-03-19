@@ -103,7 +103,7 @@ public class Main extends Application {
 			Connection conn = null;												// initialize connection, etc, to access database
 			PreparedStatement ps = null;
 			String url = "jdbc:sqlite:HighScores.db";							//url of database
-			String sqlIns = "INSERT INTO high_scores (name, score) VALUES(?, ?)";// sql code to insert score into database
+			String sqlIns = "INSERT INTO high_scores (name, score) VALUES(?, ?)";							// sql code to insert score into database
 			String sqlDel = "DELETE FROM high_scores WHERE score = (SELECT MIN(score) FROM high_scores)";	// sql code to delete lowest score from database
 			try {
 				conn = DriverManager.getConnection(url);						// connect to database and execute sql code to insert score
