@@ -19,22 +19,22 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception{
-		//		primaryStage.setTitle("Toast");
-		//
-		//		Pane root = new Pane();
-		//		Scene theScene = new Scene(root);
-		//		primaryStage.setScene(theScene);
-		//
-		//		Canvas canvas = new Canvas(1000, 750);
-		//		root.getChildren().add(canvas);
-		//
-		//		GraphicsContext gc = canvas.getGraphicsContext2D();
-		//
-		//		Image circle = new Image("file:resources/Circle.png");
-		//
-		//		gc.drawImage(circle, 250, 150);
-		//
-		//		primaryStage.show();
+//				primaryStage.setTitle("Toast");
+//		
+//				Pane root = new Pane();
+//				Scene theScene = new Scene(root);
+//				primaryStage.setScene(theScene);
+//		
+//				Canvas canvas = new Canvas(1000, 750);
+//				root.getChildren().add(canvas);
+//		
+//				GraphicsContext gc = canvas.getGraphicsContext2D();
+//		
+//				Image circle = new Image("file:resources/Circle.png");
+//		
+//				gc.drawImage(circle, 250, 150);
+//		
+//				primaryStage.show();
 
 	}
 
@@ -61,28 +61,29 @@ public class Main extends Application {
 		}
 	}
 
+	// Class holding methods relating to HighScores SQLite database
 	private static class HighScores {
-		static ArrayList<Score> highScores = new ArrayList<Score>();
+		static ArrayList<Score> highScores = new ArrayList<Score>();				// Initialize ArrayList to hold scores
 
-
+		// Loads scores from database into array
 		private static void loadScores() {
-			Connection conn = null;
+			Connection conn = null;													// Initialize connection, etc, to access database
 			Statement smt = null;
 			ResultSet rs = null;
-			String url = "jdbc:sqlite:HighScores.db";
-			String sql = "SELECT Name, Score FROM HighScores ORDER BY Score DESC";
+			String url = "jdbc:sqlite:HighScores.db";								// url of database
+			String sql = "SELECT name, score FROM high_scores ORDER BY score DESC";	// sql code to query/sort scores in database
 			try {
-				conn = DriverManager.getConnection(url);
+				conn = DriverManager.getConnection(url);							// connect to database and execute sql code to query
 				smt = conn.createStatement();
 				rs = smt.executeQuery(sql);
-				while(rs.next()) {
-					highScores.add(new Score(rs.getString("Name"), rs.getInt("Score")));
+				while(rs.next()) {													// iterate through results and load scores into highScores ArrayList
+					highScores.add(new Score(rs.getString("name"), rs.getInt("score")));
 				}
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			} finally {
 				try {
-					if (rs != null) {
+					if (rs != null) {												// close connection, etc
 						rs.close();
 					}
 					if (smt != null) {
@@ -96,26 +97,27 @@ public class Main extends Application {
 				}
 			}
 		}
-
+		
+		// adds new score to HighScore database and removes lowest score
 		private static void saveScores(Score currentScore) {
-			Connection conn = null;
+			Connection conn = null;												// initialize connection, etc, to access database
 			PreparedStatement ps = null;
-			String url = "jdbc:sqlite:HighScores.db";
-			String sqlIns = "INSERT INTO HighScores (Name, Score) VALUES(?, ?)";
-			String sqlDel = "DELETE FROM HighScores WHERE Score = (SELECT MIN(Score) FROM HighScores)";
+			String url = "jdbc:sqlite:HighScores.db";							//url of database
+			String sqlIns = "INSERT INTO high_scores (name, score) VALUES(?, ?)";// sql code to insert score into database
+			String sqlDel = "DELETE FROM high_scores WHERE score = (SELECT MIN(score) FROM high_scores)";	// sql code to delete lowest score from database
 			try {
-				conn = DriverManager.getConnection(url);
+				conn = DriverManager.getConnection(url);						// connect to database and execute sql code to insert score
 				ps = conn.prepareStatement(sqlIns);
 				ps.setString(1, currentScore.getName());
 				ps.setInt(2, currentScore.getScore());
 				ps.executeUpdate();
-				ps = conn.prepareStatement(sqlDel);
+				ps = conn.prepareStatement(sqlDel);								// execute sql code to delete score
 				ps.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			} finally {
 				try {
-					if (ps != null) {
+					if (ps != null) {											// close connection, etc
 						ps.close();
 					}
 					if (conn != null) {
@@ -126,16 +128,18 @@ public class Main extends Application {
 				}
 			}
 		}
-
+		
+		// Compares score to high scores and updates high scores if higher
+		// Returns high score position of score or -1 if not higher
 		private static int compareHighScores(Score currentScore) {
-			for (int i = 0; i < 10 ; i++) {
+			for (int i = 0; i < 10 ; i++) {										// compares current score to each score in HighScores
 				if (currentScore.getScore() > highScores.get(i).getScore()) {
-					highScores.add(i, currentScore);
-					highScores.remove(10);
-					return i+1;
+					highScores.add(i, currentScore);							// adds currentScore to highScores
+					highScores.remove(10);										// removes last score from highScores
+					return i+1;													// returns position currentScore was placed in
 				}
 			}
-			return -1;
+			return -1;															// returns -1 if score was less than all high scores
 		}
 
 	}
