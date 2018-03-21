@@ -45,7 +45,9 @@ public class Main extends Application {
 	}
 
 	public static void main(String[] args) {
-		highScoreTest();
+		HighScores.checkDatabase();
+		//highScoreTest();
+		System.out.println(System.currentTimeMillis());
 		launch(args);
 	}
 
@@ -67,71 +69,54 @@ public class Main extends Application {
 		}
 	}
 
+	
 	// Class holding methods relating to HighScores SQLite database
 	private static class HighScores {
 		static ArrayList<Score> highScores = new ArrayList<Score>();				// Initialize ArrayList to hold scores
-
+		
+		private static void checkDatabase() {
+			String url = "jdbc:sqlite:HighScores.db";								// url of database
+			String sql = "CREATE TABLE IF NOT EXISTS high_scores ("
+					+ "name text, "
+					+ "score integer, "
+					+ "timestamp integer);";
+			try (Connection conn = DriverManager.getConnection(url);				// connect to database and execute sql code to query
+				Statement smt = conn.createStatement()) {
+				smt.execute(sql);
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
 		// Loads scores from database into array
 		private static void loadScores() {
-			Connection conn = null;													// Initialize connection, etc, to access database
-			Statement smt = null;
-			ResultSet rs = null;
 			String url = "jdbc:sqlite:HighScores.db";								// url of database
 			String sql = "SELECT name, score FROM high_scores ORDER BY score DESC";	// sql code to query/sort scores in database
-			try {
-				conn = DriverManager.getConnection(url);							// connect to database and execute sql code to query
-				smt = conn.createStatement();
-				rs = smt.executeQuery(sql);
+			try (Connection conn = DriverManager.getConnection(url);							// connect to database and execute sql code to query
+				Statement smt = conn.createStatement();
+				ResultSet rs = smt.executeQuery(sql)) {
 				while(rs.next()) {													// iterate through results and load scores into highScores ArrayList
 					highScores.add(new Score(rs.getString("name"), rs.getInt("score")));
 				}
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
-			} finally {
-				try {
-					if (rs != null) {												// close connection, etc
-						rs.close();
-					}
-					if (smt != null) {
-						smt.close();
-					}
-					if (conn != null) {
-						conn.close();
-					}
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-				}
 			}
 		}
 		
 		// adds new score to HighScore database and removes lowest score
 		private static void saveScores(Score currentScore) {
-			Connection conn = null;												// initialize connection, etc, to access database
-			PreparedStatement ps = null;
 			String url = "jdbc:sqlite:HighScores.db";							//url of database
-			String sqlIns = "INSERT INTO high_scores (name, score) VALUES(?, ?)";							// sql code to insert score into database
-			String sqlDel = "DELETE FROM high_scores WHERE score = (SELECT MIN(score) FROM high_scores)";	// sql code to delete lowest score from database
-			try {
-				conn = DriverManager.getConnection(url);						// connect to database and execute sql code to insert score
-				ps = conn.prepareStatement(sqlIns);
+			String sqlIns = "INSERT INTO high_scores (name, score, timestamp) VALUES(?, ?, ?)";							// sql code to insert score into database
+			String sqlDel = "DELETE FROM high_scores WHERE timestamp = (SELECT MAX(timestamp) FROM (SELECT MIN(score) FROM high_scores)";	// sql code to delete lowest score from database
+			try (Connection conn = DriverManager.getConnection(url);						// connect to database and execute sql code to insert score
+				PreparedStatement ps = conn.prepareStatement(sqlIns);
+				Statement smt = conn.createStatement();) {
 				ps.setString(1, currentScore.getName());
 				ps.setInt(2, currentScore.getScore());
-				ps.executeUpdate();
-				ps = conn.prepareStatement(sqlDel);								// execute sql code to delete score
-				ps.executeUpdate();
+				ps.setLong(3, System.currentTimeMillis());
+				ps.execute();
+				smt.execute(sqlDel);
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
-			} finally {
-				try {
-					if (ps != null) {											// close connection, etc
-						ps.close();
-					}
-					if (conn != null) {
-						conn.close();
-					}
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-				}
 			}
 		}
 		
@@ -147,7 +132,5 @@ public class Main extends Application {
 			}
 			return -1;															// returns -1 if score was less than all high scores
 		}
-
 	}
 }
-
