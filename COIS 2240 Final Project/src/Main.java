@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -19,23 +20,28 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception{
-//				primaryStage.setTitle("Toast");
-//		
-//				Pane root = new Pane();
-//				Scene theScene = new Scene(root);
-//				primaryStage.setScene(theScene);
-//		
-//				Canvas canvas = new Canvas(1000, 750);
-//				root.getChildren().add(canvas);
-//		
-//				GraphicsContext gc = canvas.getGraphicsContext2D();
-//		
-//				Image circle = new Image("file:resources/Circle.png");
-//		
-//				gc.drawImage(circle, 250, 150);
-//		
-//				primaryStage.show();
-
+				primaryStage.setTitle("Toast");
+		
+				Pane root = new Pane();
+				Scene theScene = new Scene(root);
+				primaryStage.setScene(theScene);
+		
+				Canvas canvas = new Canvas(800, 800);
+				root.getChildren().add(canvas);
+		
+				GraphicsContext gc = canvas.getGraphicsContext2D();
+		
+				/*Image circleImage = new Image("file:resources/Circle.png");
+				ImageView circleImageView = new ImageView(circleImage);
+				Image semicircleImage = new Image("file:resources/semicircle.png");
+				ImageView semicircleImageVeiw = new ImageView(semicircleImage);
+				semicircle.setRotate(90);
+				gc.drawImage(circleImageView, 350, 350);
+				gc.drawImage(semicircle, 390, 340);*/
+				
+				
+		
+				primaryStage.show();
 	}
 
 	public static void main(String[] args) {
