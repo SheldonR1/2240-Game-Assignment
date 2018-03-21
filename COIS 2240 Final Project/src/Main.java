@@ -20,7 +20,8 @@ import javafx.stage.Stage;
 import javafx.animation.*;
 
 public class Main extends Application {
-
+	
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception{
 				primaryStage.setTitle("Toast");
@@ -80,7 +81,8 @@ public class Main extends Application {
 				            
 				            if (input.contains("RIGHT"))   //EQUATIONS FOR MOVEMENT REQUIRED
 				            {
-				            	
+				            
+				            
 				            }
 				            else if (input.contains("LEFT")) //EQUATIONS FOR MOVEMENT REQUIRED
 				            {
