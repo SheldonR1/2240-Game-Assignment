@@ -46,91 +46,127 @@ public class Main extends Application {
 
 	public static void main(String[] args) {
 		HighScores.checkDatabase();
-		//highScoreTest();
-		System.out.println(System.currentTimeMillis());
+		highScoreTest();
 		launch(args);
 	}
 
+	// used to test score class
 	public static void highScoreTest() {
-		Score toast = new Score("toast3", 300);
-		HighScores.loadScores();
-		for(Score i : HighScores.highScores) {
-			System.out.print(i.getName() + ": " + i.getScore() + "\n");
-		}
-		int pos = HighScores.compareHighScores(toast);
-		if (pos >= 0) {
-			System.out.println("New High Score: Pos " + (pos));
-			HighScores.saveScores(toast);
+		GameState gameState = new GameState();
+		HighScores.outputHighScores(gameState.getTimestamp());
+		gameState.setName("toast15");
+		for (int i = 1; i < 4; i++)
+			gameState.asteroidDestroyed();
+		if (!(HighScores.enoughHighScores())){
+			HighScores.addHighScore(gameState.getName(), gameState.getScore(), gameState.getTimestamp());
+			System.out.println("New High Score");
+		} else if (HighScores.higherScore(gameState.getScore())) {
+			HighScores.addHighScore(gameState.getName(), gameState.getScore(), gameState.getTimestamp());
+			HighScores.removeHighScore();
+			System.out.println("New High Score");
 		} else {
 			System.out.println("No New High Score");
 		}
-		for(Score i : HighScores.highScores) {
-			System.out.print(i.getName() + ": " + i.getScore() + "\n");
-		}
+		HighScores.outputHighScores(gameState.getTimestamp());
+		
 	}
 
 	
 	// Class holding methods relating to HighScores SQLite database
 	private static class HighScores {
-		static ArrayList<Score> highScores = new ArrayList<Score>();				// Initialize ArrayList to hold scores
 		
+		// attempts to connect to database/table and recreates them if they are not found
 		private static void checkDatabase() {
-			String url = "jdbc:sqlite:HighScores.db";								// url of database
-			String sql = "CREATE TABLE IF NOT EXISTS high_scores ("
-					+ "name text, "
-					+ "score integer, "
-					+ "timestamp integer);";
-			try (Connection conn = DriverManager.getConnection(url);				// connect to database and execute sql code to query
+			String url = "jdbc:sqlite:HighScores.db";																// url of database
+			String sql = "CREATE TABLE IF NOT EXISTS high_scores (name text, score integer, timestamp integer);";	// sql code to create a new table if one is not found
+			try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
 				Statement smt = conn.createStatement()) {
-				smt.execute(sql);
+				smt.executeUpdate(sql);
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			}
 		}
-		// Loads scores from database into array
-		private static void loadScores() {
-			String url = "jdbc:sqlite:HighScores.db";								// url of database
-			String sql = "SELECT name, score FROM high_scores ORDER BY score DESC";	// sql code to query/sort scores in database
-			try (Connection conn = DriverManager.getConnection(url);							// connect to database and execute sql code to query
+		
+		// adds new score to HighScore database
+		private static void addHighScore(String name, int score, long timestamp) {
+			String url = "jdbc:sqlite:HighScores.db";																// url of database
+			String sql = "INSERT INTO high_scores (name, score, timestamp) VALUES(?, ?, ?)";						// sql code to insert score into database
+			try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
+				PreparedStatement ps = conn.prepareStatement(sql)) {
+				ps.setString(1, name);																				// load values into wildcards of prepared statement
+				ps.setInt(2, score);
+				ps.setLong(3, timestamp);
+				ps.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		
+		// removes the lowest/most recent high score from the database
+		private static void removeHighScore() {
+			String url = "jdbc:sqlite:HighScores.db";																// url of database
+			String sql = "DELETE FROM high_scores WHERE timestamp = (SELECT MAX(timestamp) FROM (SELECT * FROM high_scores WHERE score = (SELECT MIN(score) FROM high_scores)))";	// sql code to delete lowest score with most recent timestamp
+			try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
+				Statement smt = conn.createStatement()) {
+				smt.executeUpdate(sql);
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		
+		// Checks if 10 high scores saved and returns false if not
+		private static boolean enoughHighScores() {
+
+			String url = "jdbc:sqlite:HighScores.db";																// url of database
+			String sql = "SELECT COUNT(*) FROM high_scores";														// sql code to determine number of high scores stored in table
+			try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
 				Statement smt = conn.createStatement();
 				ResultSet rs = smt.executeQuery(sql)) {
-				while(rs.next()) {													// iterate through results and load scores into highScores ArrayList
-					highScores.add(new Score(rs.getString("name"), rs.getInt("score")));
+				while(rs.next()) {
+					if (rs.getInt(1) < 10)																			// returns false if number of scores < 10
+						return false;
 				}
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			}
+			return true;																							// returns true otherwise
 		}
 		
-		// adds new score to HighScore database and removes lowest score
-		private static void saveScores(Score currentScore) {
-			String url = "jdbc:sqlite:HighScores.db";							//url of database
-			String sqlIns = "INSERT INTO high_scores (name, score, timestamp) VALUES(?, ?, ?)";							// sql code to insert score into database
-			String sqlDel = "DELETE FROM high_scores WHERE timestamp = (SELECT MAX(timestamp) FROM (SELECT MIN(score) FROM high_scores)";	// sql code to delete lowest score from database
-			try (Connection conn = DriverManager.getConnection(url);						// connect to database and execute sql code to insert score
-				PreparedStatement ps = conn.prepareStatement(sqlIns);
-				Statement smt = conn.createStatement();) {
-				ps.setString(1, currentScore.getName());
-				ps.setInt(2, currentScore.getScore());
-				ps.setLong(3, System.currentTimeMillis());
-				ps.execute();
-				smt.execute(sqlDel);
+		// Compares score to high scores in database and returns true if new score is higher than any saved scores
+		private static boolean higherScore(int score) {
+			String url = "jdbc:sqlite:HighScores.db";																// url of database
+			String sql = "SELECT name, score FROM high_scores ORDER BY score DESC";									// sql code to return sorted scores from database
+			try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
+				Statement smt = conn.createStatement();
+				ResultSet rs = smt.executeQuery(sql)) {
+				while(rs.next()) {																					// iterate through results and return true if new score is higher than any in table
+					if (rs.getInt("score") < score)
+						return true;
+				}
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			}
+			return false;																							// returns false otherwise
 		}
 		
-		// Compares score to high scores and updates high scores if higher
-		// Returns high score position of score or -1 if not higher
-		private static int compareHighScores(Score currentScore) {
-			for (int i = 0; i < 10 ; i++) {										// compares current score to each score in HighScores
-				if (currentScore.getScore() > highScores.get(i).getScore()) {
-					highScores.add(i, currentScore);							// adds currentScore to highScores
-					highScores.remove(10);										// removes last score from highScores
-					return i+1;													// returns position currentScore was placed in
+		// outputs all high scores
+		// output method must be changed to display on screen
+		private static void outputHighScores(long timestamp) {
+			String url = "jdbc:sqlite:HighScores.db";																// url of database
+			String sql = "SELECT name, score, timestamp FROM high_scores ORDER BY score DESC, timestamp ASC";		// sql code to return sorted scores from database
+			try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
+				Statement smt = conn.createStatement();
+				ResultSet rs = smt.executeQuery(sql)) {
+				while(rs.next()) {																					// iterate through results and output, indicates which score if any is new
+					if (rs.getLong("timestamp") == timestamp)
+						System.out.println("---->" + rs.getString(1) + " " + rs.getInt(2));
+					else 
+						System.out.println(rs.getString(1) + " " + rs.getInt(2));
 				}
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
 			}
-			return -1;															// returns -1 if score was less than all high scores
 		}
 	}
+	
 }

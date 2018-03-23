@@ -1,11 +1,13 @@
 
 public class GameState {
 	private final long startTime;
+	private final long timestamp;
 	private int score;
 	private int gameStage;
-	int lives;
+	private int lives;
 	private int combo;
-	int numDest;
+	private int numDest;
+	private String name;
 	public GameState() {
 		startTime = System.nanoTime();
 		score = 0;
@@ -13,6 +15,8 @@ public class GameState {
 		lives = 10;
 		combo = 1;
 		numDest = 0;
+		name = "";
+		timestamp = System.currentTimeMillis();
 	}
 	public int getScore() {
 		return score;
@@ -25,6 +29,15 @@ public class GameState {
 	}
 	public int getNumDest() {
 		return numDest;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public long getTimestamp( ) {
+		return timestamp;
 	}
 	public long getElapsedTime( ) {
 		return startTime - System.nanoTime();
