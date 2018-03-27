@@ -1,14 +1,14 @@
 
 public class GameState {
-	private final long startTime;
-	private final long timestamp;
-	private int score;
-	private int gameStage;
-	private int lives;
-	private int combo;
-	private int numDest;
-	private String name;
-	public GameState() {
+	private static final long startTime = System.nanoTime();
+	private static final long timestamp = System.currentTimeMillis();
+	private static int score = 0;
+	private static int gameStage = 1;
+	private static int lives = 10;
+	private static int combo = 1;
+	private static int numDest = 0;
+	private static String name = "";
+	/*public GameState() {
 		startTime = System.nanoTime();
 		score = 0;
 		gameStage = 1;
@@ -17,43 +17,43 @@ public class GameState {
 		numDest = 0;
 		name = "";
 		timestamp = System.currentTimeMillis();
-	}
-	public int getScore() {
+	}*/
+	public static int getScore() {
 		return score;
 	}
-	public int getGameStage() {
+	public static int getGameStage() {
 		return gameStage;
 	}
-	public int getCombo() {
+	public static int getCombo() {
 		return combo;
 	}
-	public int getNumDest() {
+	public static int getNumDest() {
 		return numDest;
 	}
-	public String getName() {
+	public static String getName() {
 		return name;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public static void setName(String name) {
+		GameState.name = name;
 	}
-	public long getTimestamp( ) {
+	public static long getTimestamp( ) {
 		return timestamp;
 	}
-	public long getElapsedTime( ) {
+	public static long getElapsedTime( ) {
 		return startTime - System.nanoTime();
 	}
-	public void asteroidDestroyed() {
+	public static void asteroidDestroyed() {
 		score += 100 * gameStage * combo;
 		combo += 1;
 		numDest += 1;
 		if (numDest >= (gameStage * 10))
 			upStage();
 	}
-	public void asteroidHit() {
+	public static void asteroidHit() {
 		combo = 1;
 		lives -= 1;
 	}
-	public void upStage() {
+	public static void upStage() {
 		score += gameStage * 1000;
 		gameStage += 1;
 		lives += 1;
