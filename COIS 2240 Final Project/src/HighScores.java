@@ -93,7 +93,7 @@ public class HighScores {
 		return false;																							// returns false otherwise
 	}
 
-	public static GridPane enterScoreName() {
+	public static GridPane highScoreEntry() {
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);

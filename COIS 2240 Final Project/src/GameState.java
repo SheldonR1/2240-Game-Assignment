@@ -1,13 +1,16 @@
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class GameState {
 	private static final long startTime = System.nanoTime();
 	private static final long timestamp = System.currentTimeMillis();
 	private static int score = 0;
 	private static int gameStage = 1;
-	private static int lives = 10;
+	private static SimpleIntegerProperty lives = new SimpleIntegerProperty(10);
 	private static int combo = 1;
 	private static int numDest = 0;
-	private static String name = "";
+	private static SimpleStringProperty name = new SimpleStringProperty("");
 	/*public GameState() {
 		startTime = System.nanoTime();
 		score = 0;
@@ -31,10 +34,19 @@ public class GameState {
 		return numDest;
 	}
 	public static String getName() {
-		return name;
+		return name.get();
 	}
 	public static void setName(String name) {
-		GameState.name = name;
+		GameState.name.set(name);
+	}
+	public static SimpleStringProperty nameProperty() {
+		return name;
+	}
+	public static int getLives() {
+		return lives.get();
+	}
+	public static SimpleIntegerProperty livesProperty() {
+		return lives;
 	}
 	public static long getTimestamp( ) {
 		return timestamp;
@@ -51,12 +63,12 @@ public class GameState {
 	}
 	public static void asteroidHit() {
 		combo = 1;
-		lives -= 1;
+		lives.set(lives.get() - 1);
 	}
 	public static void upStage() {
 		score += gameStage * 1000;
 		gameStage += 1;
-		lives += 1;
+		lives.set(lives.get() + 1);
 		numDest = 0;
 	}
 }
