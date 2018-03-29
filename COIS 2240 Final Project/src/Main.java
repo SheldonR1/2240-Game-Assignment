@@ -15,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -79,14 +80,30 @@ public class Main extends Application {
 		launch(args);
 	}
 	
-	
-	public static void transitionToScores() {
+	public static GridPane startScreen() {
+		GridPane grid = new GridPane();
+		grid.setAlignment(Pos.CENTER);
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(5, 5, 5, 5));
+		Label lblHighScoreMsg = new Label("Game Title");
+		lblHighScoreMsg.setFont(new Font(100));
+		Label lblNamePrompt = new Label("How to Play: \n"
+				+ "The object of this game is to defend the planet by shooting meteors before they make contact"
+				+ "Use the mouse to aim and click to fire"
+				+ "If the planet gets hit to many times the game will end");
+		Button btStart = new Button("Start");
+		btStart.setOnAction((event) -> {
+			
+		});
 		
+		return grid;
 	}
+	
 
 	// used to test score class
 	public static void highScoreTest() {
-		for (int i = 1; i < 9; i++)
+		for (int i = 1; i < 1; i++)
 			GameState.asteroidDestroyed();
 	}
 }

@@ -1,3 +1,4 @@
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -11,6 +12,9 @@ public class GameState {
 	private static int combo = 1;
 	private static int numDest = 0;
 	private static SimpleStringProperty name = new SimpleStringProperty("");
+	private static SimpleBooleanProperty gameStarted = new SimpleBooleanProperty(false);
+	private static SimpleBooleanProperty gameEnded = new SimpleBooleanProperty(false);
+	private static SimpleBooleanProperty needName = new SimpleBooleanProperty(false);
 	/*public GameState() {
 		startTime = System.nanoTime();
 		score = 0;

@@ -121,8 +121,7 @@ public class HighScores {
 	}
 	
 
-	// outputs all high scores
-	// output method must be changed to display on screen
+	
 	public static GridPane displayHighScores(long timestamp) {
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
@@ -138,10 +137,7 @@ public class HighScores {
 				Statement smt = conn.createStatement();
 				ResultSet rs = smt.executeQuery(sql)) {
 			while(rs.next()) {
-				newScore = false;
-				if (timestamp == rs.getLong("timestamp")) {
-					newScore = true;
-				}
+				newScore = (timestamp == rs.getLong("timestamp"));
 				grid.add(newScoreLabel(String.valueOf(scorePos), newScore), 0, scorePos);
 				grid.add(newScoreLabel(rs.getString("name"), newScore), 1, scorePos);
 				grid.add(newScoreLabel(String.valueOf(rs.getInt("score")), newScore), 2, scorePos);
