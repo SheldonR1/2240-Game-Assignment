@@ -18,6 +18,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.animation.*;
+import javafx.geometry.*;
 
 public class Main extends Application {
 	
@@ -30,17 +31,25 @@ public class Main extends Application {
 				Scene theScene = new Scene(root);
 				primaryStage.setScene(theScene);
 		
-				Canvas canvas = new Canvas(1000, 750);
+				Canvas canvas = new Canvas(1000, 1000);
 				root.getChildren().add(canvas);
-		
+				primaryStage.setResizable(false);
+					
+				
 				GraphicsContext gc = canvas.getGraphicsContext2D();
+				canvas.toBack();
+				
 				Image background = new Image("file:resources/background.jpg"); //sets background
-				
 				Image circle = new Image("file:resources/Circle.png");     // sets the circle
-						canvas.toBack();
-				ImageView player = new ImageView();
-				player.setImage(circle);
+				Image player = new Image("file:resources/carsprite.png",150,75,true, true); //sets player image as car
+				Image bullet = new Image("file:resources/bullet.png", 25,25,true,true);       //sets bullets
+				Image planet = new Image("file:resources/earth.png", 150,150,true,true);      //sets planet
+			
+				Player playerData = new Player(player); 
+				bullets projectile = new bullets(bullet);
+				RangeFinder rangefinder = new RangeFinder(500, 375);
 				
+							
 				
 						ArrayList<String> input = new ArrayList<String>();    //used to track the user's input
 					 
@@ -65,147 +74,60 @@ public class Main extends Application {
 					    	}
 					    	
 					    		});
+					    
 						
 				 final long startNanoTime = System.nanoTime();
-               		
+               	
+				
+		         
+				 
 				  new AnimationTimer()
 				    {
 				        public void handle(long currentNanoTime)
 				        {
-				            double t = (currentNanoTime - startNanoTime) / 1000000000.0; 
-				
+				            
+				        	
 				        //    gc.clearRect(0, 0, 1000,750);        //clears the canvas
-				            gc.drawImage(background, 0, 0);     //draws the canvas
-				            gc.drawImage(circle, 500, 375);    //draws the circle 
-				           				            //CIRCULAR MOVEMENT EQUATION
+			
+				            
+				            //CIRCULAR MOVEMENT EQUATION
 				            
 				            if (input.contains("RIGHT"))   //EQUATIONS FOR MOVEMENT REQUIRED
 				            {
-				            
-				            
+				            	playerData.incPosCounter();
+				            	playerData.update();
 				            }
 				            else if (input.contains("LEFT")) //EQUATIONS FOR MOVEMENT REQUIRED
 				            {
-	  
-	   
+				            	playerData.decPosCounter();
+				            	playerData.update();
+					             
+				            }
+				            if (input.contains("SPACE"))
+				            {   double x = rangefinder.CalculateSlope(playerData.getPositionX() , playerData.getPositionY());
+				            	projectile.update(playerData.getPositionX(), playerData.getPositionY());				            	
 				            }
 				 
 				            // background image clears canvas
 	   					
-				           
+				            gc.drawImage(background, 0, 0);     //draws the canvas
+				            gc.drawImage(planet, 500, 375);    //draws the circle 
+				             playerData.render(gc);
+				            gc.drawImage(bullet, 300, 375);
+				            
 				          
 				        }
 				    }.start();
 				    
 				 primaryStage.show();
 
-				//stat pane
+				
 	}
 
 	public static void main(String[] args) {
-		highScoreTest();
-		launch(args);
-	}
-
-	public static void highScoreTest() {
-		Score toast = new Score("toast3", 300);
-		HighScores.loadScores();
-		for(Score i : HighScores.highScores) {
-			System.out.print(i.getName() + ": " + i.getScore() + "\n");
-		}
-		int pos = HighScores.compareHighScores(toast);
-		if (pos >= 0) {
-			System.out.println("New High Score: Pos " + (pos));
-			HighScores.saveScores(toast);
-		} else {
-			System.out.println("No New High Score");
-		}
-		for(Score i : HighScores.highScores) {
-			System.out.print(i.getName() + ": " + i.getScore() + "\n");
-		}
-	}
-
-	// Class holding methods relating to HighScores SQLite database
-	private static class HighScores {
-		static ArrayList<Score> highScores = new ArrayList<Score>();				// Initialize ArrayList to hold scores
-
-		// Loads scores from database into array
-		private static void loadScores() {
-			Connection conn = null;													// Initialize connection, etc, to access database
-			Statement smt = null;
-			ResultSet rs = null;
-			String url = "jdbc:sqlite:HighScores.db";								// url of database
-			String sql = "SELECT name, score FROM high_scores ORDER BY score DESC";	// sql code to query/sort scores in database
-			try {
-				conn = DriverManager.getConnection(url);							// connect to database and execute sql code to query
-				smt = conn.createStatement();
-				rs = smt.executeQuery(sql);
-				while(rs.next()) {													// iterate through results and load scores into highScores ArrayList
-					highScores.add(new Score(rs.getString("name"), rs.getInt("score")));
-				}
-			} catch (SQLException e) {
-				System.out.println(e.getMessage());
-			} finally {
-				try {
-					if (rs != null) {												// close connection, etc
-						rs.close();
-					}
-					if (smt != null) {
-						smt.close();
-					}
-					if (conn != null) {
-						conn.close();
-					}
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-				}
-			}
-		}
-		
-		// adds new score to HighScore database and removes lowest score
-		private static void saveScores(Score currentScore) {
-			Connection conn = null;												// initialize connection, etc, to access database
-			PreparedStatement ps = null;
-			String url = "jdbc:sqlite:HighScores.db";							//url of database
-			String sqlIns = "INSERT INTO high_scores (name, score) VALUES(?, ?)";							// sql code to insert score into database
-			String sqlDel = "DELETE FROM high_scores WHERE score = (SELECT MIN(score) FROM high_scores)";	// sql code to delete lowest score from database
-			try {
-				conn = DriverManager.getConnection(url);						// connect to database and execute sql code to insert score
-				ps = conn.prepareStatement(sqlIns);
-				ps.setString(1, currentScore.getName());
-				ps.setInt(2, currentScore.getScore());
-				ps.executeUpdate();
-				ps = conn.prepareStatement(sqlDel);								// execute sql code to delete score
-				ps.executeUpdate();
-			} catch (SQLException e) {
-				System.out.println(e.getMessage());
-			} finally {
-				try {
-					if (ps != null) {											// close connection, etc
-						ps.close();
-					}
-					if (conn != null) {
-						conn.close();
-					}
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-				}
-			}
-		}
-		
-		// Compares score to high scores and updates high scores if higher
-		// Returns high score position of score or -1 if not higher
-		private static int compareHighScores(Score currentScore) {
-			for (int i = 0; i < 10 ; i++) {										// compares current score to each score in HighScores
-				if (currentScore.getScore() > highScores.get(i).getScore()) {
-					highScores.add(i, currentScore);							// adds currentScore to highScores
-					highScores.remove(10);										// removes last score from highScores
-					return i+1;													// returns position currentScore was placed in
-				}
-			}
-			return -1;															// returns -1 if score was less than all high scores
-		}
-
+				launch(args);
 	}
 }
 
+
+	
