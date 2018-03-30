@@ -18,11 +18,11 @@ public double CalculateSlope(double playerX, double playerY)
 	this.playerX=playerX;
 	this.playerY = playerY; 
 	
-	slopeY = playerY-planetY;
-	slopeX = playerX-planetX;
+	slopeY = planetY-playerY;
+	slopeX = planetX-playerX;
 	
 	slope = slopeY/slopeX; 
 	
-	return slope; 
+	return slope*-1; 
 }
 }

@@ -9,6 +9,8 @@ public class bullets {
     private double width; 
     private double height;
     private Image bullet;
+    private double slope;
+    private double speed = 2; 
     
     public bullets(Image bullet)
     {  
@@ -16,15 +18,19 @@ public class bullets {
     	this.bullet = bullet; 
     }
     
-    public void update(double positionX, double positionY)
+    public void update(double positionX, double positionY,double slope)
     {
     	this.positionX = positionX;
     	this.positionY = positionY;
+    	this.slope = slope;
+    	 
+    	  
+    	
     
     }
     public void render(GraphicsContext gc)
     {
-    gc.drawImage(bullet, positionX, positionY);
+    gc.drawImage(bullet, this.getPositionX(), this.getPositionY());
     }
     public Rectangle2D getBoundary()
     {
@@ -34,6 +40,14 @@ public class bullets {
     public boolean intersects(bullets shot)
     {
     	return shot.getBoundary().intersects(this.getBoundary());
+    }
+    public double getPositionX()
+    {   positionX += speed;
+    	return positionX;
+    }
+    public double getPositionY()
+    { positionY+=speed*slope;
+    	return positionY;
     }
     
     }    

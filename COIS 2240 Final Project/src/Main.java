@@ -41,7 +41,7 @@ public class Main extends Application {
 				
 				Image background = new Image("file:resources/background.jpg"); //sets background
 				Image circle = new Image("file:resources/Circle.png");     // sets the circle
-				Image player = new Image("file:resources/carsprite.png",150,75,true, true); //sets player image as car
+				Image player = new Image("file:resources/carsprite.png",450,75,true, true); //sets player image as car
 				Image bullet = new Image("file:resources/bullet.png", 25,25,true,true);       //sets bullets
 				Image planet = new Image("file:resources/earth.png", 150,150,true,true);      //sets planet
 			
@@ -105,15 +105,18 @@ public class Main extends Application {
 				            }
 				            if (input.contains("SPACE"))
 				            {   double x = rangefinder.CalculateSlope(playerData.getPositionX() , playerData.getPositionY());
-				            	projectile.update(playerData.getPositionX(), playerData.getPositionY());				            	
+				            	projectile.update(playerData.getPositionX(), playerData.getPositionY(),x);	
+				            	
 				            }
 				 
 				            // background image clears canvas
 	   					
-				            gc.drawImage(background, 0, 0);     //draws the canvas
-				            gc.drawImage(planet, 500, 375);    //draws the circle 
+				            gc.drawImage(background, 10, 10);     //draws the canvas
+				            gc.drawImage(planet, 385, 385);    //draws the circle 
 				             playerData.render(gc);
-				            gc.drawImage(bullet, 300, 375);
+				             projectile.render(gc);
+				             
+				             
 				            
 				          
 				        }

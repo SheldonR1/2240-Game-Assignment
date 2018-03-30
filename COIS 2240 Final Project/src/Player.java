@@ -14,8 +14,8 @@ public class Player {
     
     public Player(Image player)
     {  
-    	positionX = 232;
-    	positionY = 232;
+    	positionX = 450;
+    	positionY = 175;
     	this.player = player;
     	posCounter = 0;
     
@@ -23,8 +23,8 @@ public class Player {
     
     }
     public void update() {
-    	setPositionX(232 + 128 * Math.cos(Math.toDegrees(posCounter))); 
-    	setPositionY(232 + 128 * Math.sin(Math.toDegrees(posCounter)));
+    	setPositionX(450 + 175 * Math.cos(Math.toDegrees(posCounter))); 
+    	setPositionY(450 + 175 * Math.sin(Math.toDegrees(posCounter)));
     	
 
     }
