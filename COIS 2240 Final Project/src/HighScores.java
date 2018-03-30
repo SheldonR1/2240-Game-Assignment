@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -16,9 +15,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-//Class holding methods relating to HighScores SQLite database
-public class HighScores {
-
+// Class holding methods relating to HighScores SQLite database
+public final class HighScores {
+	// private constructor to prevent instantiation
+	private HighScores(){};
+	
 	// attempts to connect to database/table and recreates them if they are not found
 	public static void checkDatabase() {
 		String url = "jdbc:sqlite:HighScores.db";																// url of database
@@ -93,7 +94,9 @@ public class HighScores {
 		return false;																							// returns false otherwise
 	}
 
+	
 	public static GridPane highScoreEntry() {
+		GameState.addNameListener();
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);
@@ -109,7 +112,8 @@ public class HighScores {
 			if ((nameTextField.getText().length() > 15) || (nameTextField.getText().length() < 2)) {
 				lblInvalidName.setVisible(true);
 			} else {
-				GameState.setName(nameTextField.getText());
+				GameState.getGameState().setName(nameTextField.getText());
+				GameState.getGameState().setNameEntered(true);
 			}
 		});
 		HBox hBox = new HBox();
@@ -119,7 +123,6 @@ public class HighScores {
 		grid.add(lblInvalidName, 0, 5);
 		return grid;
 	}
-	
 
 	
 	public static GridPane displayHighScores(long timestamp) {

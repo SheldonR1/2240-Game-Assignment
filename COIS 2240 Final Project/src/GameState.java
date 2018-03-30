@@ -2,77 +2,139 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.layout.GridPane;
 
-public class GameState {
-	private static final long startTime = System.nanoTime();
-	private static final long timestamp = System.currentTimeMillis();
-	private static int score = 0;
-	private static int gameStage = 1;
-	private static SimpleIntegerProperty lives = new SimpleIntegerProperty(10);
-	private static int combo = 1;
-	private static int numDest = 0;
-	private static SimpleStringProperty name = new SimpleStringProperty("");
-	private static SimpleBooleanProperty gameStarted = new SimpleBooleanProperty(false);
-	private static SimpleBooleanProperty gameEnded = new SimpleBooleanProperty(false);
-	private static SimpleBooleanProperty needName = new SimpleBooleanProperty(false);
-	/*public GameState() {
+// Lazy singleton class containing various fields and methods relation to the gamestate 
+public final class GameState {
+	private static GameState gameState = null;
+	
+	private final long startTime;				//Start time of program
+	private final long timestamp;				// unix timestamp used to determine order of equal high scores
+	private int score;							// current score
+	private int gameStage;						// score/difficulty multiplier
+	private int lives;							// remaining lives
+	private int combo;							// score multiplier
+	private int numDest;						// counter for destroyed asteroids
+	private String name;						// user's name
+	private SimpleBooleanProperty gameStarted;	// flag remove start screen/load game screen
+	private SimpleBooleanProperty gameEnded;	// flag to remove game screen and load name entry or high scores screen
+	private SimpleBooleanProperty nameEntered;	// flag to remove name entry screen and load high scores screen
+	private GameState() {
 		startTime = System.nanoTime();
+		timestamp = System.currentTimeMillis();
 		score = 0;
 		gameStage = 1;
 		lives = 10;
 		combo = 1;
 		numDest = 0;
 		name = "";
-		timestamp = System.currentTimeMillis();
-	}*/
-	public static int getScore() {
+		gameStarted = new SimpleBooleanProperty(false);
+		gameEnded = new SimpleBooleanProperty(false);
+		nameEntered = new SimpleBooleanProperty(false);
+	}
+	public static GameState getGameState() {
+		if (gameState == null) {
+			gameState = new GameState();
+		}
+		return gameState;
+	}
+	public int getScore() {
 		return score;
 	}
-	public static int getGameStage() {
+	public int getGameStage() {
 		return gameStage;
 	}
-	public static int getCombo() {
+	public int getCombo() {
 		return combo;
 	}
-	public static int getNumDest() {
+	public int getNumDest() {
 		return numDest;
 	}
-	public static String getName() {
-		return name.get();
-	}
-	public static void setName(String name) {
-		GameState.name.set(name);
-	}
-	public static SimpleStringProperty nameProperty() {
+	public String getName() {
 		return name;
 	}
-	public static int getLives() {
-		return lives.get();
+	public void setName(String name) {
+		this.name = name;
 	}
-	public static SimpleIntegerProperty livesProperty() {
+	public int getLives() {
 		return lives;
 	}
-	public static long getTimestamp( ) {
+	public long getTimestamp( ) {
 		return timestamp;
 	}
-	public static long getElapsedTime( ) {
+	public long getElapsedTime( ) {
 		return startTime - System.nanoTime();
 	}
-	public static void asteroidDestroyed() {
+	public void setGameStarted(boolean gameStarted) {
+		this.gameStarted.set(gameStarted);
+	}
+	public SimpleBooleanProperty gameStartedProperty() {
+		return gameStarted;
+	}
+	public void setGameEnded(boolean gameEnded) {
+		this.gameEnded.set(gameEnded);
+	}
+	public SimpleBooleanProperty gameEndedProperty() {
+		return gameEnded;
+	}
+	public void setNameEntered(boolean nameEntered) {
+		this.nameEntered.set(nameEntered);
+	}
+	public SimpleBooleanProperty nameEnteredProperty() {
+		return nameEntered;
+	}
+	public void asteroidDestroyed() {
 		score += 100 * gameStage * combo;
 		combo += 1;
 		numDest += 1;
 		if (numDest >= (gameStage * 10))
 			upStage();
 	}
-	public static void asteroidHit() {
+	public void asteroidHit() {
 		combo = 1;
-		lives.set(lives.get() - 1);
+		lives--;
+		if (lives == 0)
+			setGameEnded(true);
 	}
-	public static void upStage() {
+	public void upStage() {
 		score += gameStage * 1000;
 		gameStage += 1;
-		lives.set(lives.get() + 1);
+		lives++;
 		numDest = 0;
+	}
+	
+	public static void addGameListener() {
+		getGameState().gameEndedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> o, Boolean oldText, Boolean newText) {
+				GameStage.getGameStage().clearNodes();
+				if (!(HighScores.enoughHighScores())){
+					GridPane highScoreEntry = HighScores.highScoreEntry();
+					GameStage.getGameStage().addNode(highScoreEntry);
+				} else if (HighScores.higherScore(GameState.getGameState().getScore())) {
+					GridPane highScoreEntry = HighScores.highScoreEntry();
+					GameStage.getGameStage().addNode(highScoreEntry);
+					HighScores.removeHighScore();
+				} else {
+					GridPane highScoresList = HighScores.displayHighScores(GameState.getGameState().getTimestamp());
+					GameStage.getGameStage().addNode(highScoresList);
+				}
+			}
+		});
+	}
+	
+	public static void addNameListener() {
+		getGameState().nameEnteredProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> o, Boolean oldText, Boolean newText) {
+				GameStage.getGameStage().clearNodes();
+				HighScores.addHighScore(GameState.getGameState().getName(), GameState.getGameState().getScore(), GameState.getGameState().getTimestamp());
+				GridPane highScoresList = HighScores.displayHighScores(GameState.getGameState().getTimestamp());
+				GameStage.getGameStage().addNode(highScoresList);
+				GameState.getGameState().nameEnteredProperty().removeListener(this);
+			}
+		});
 	}
 }

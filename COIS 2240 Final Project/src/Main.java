@@ -34,31 +34,11 @@ public class Main extends Application {
 		HighScores.checkDatabase();
 		primaryStage.setTitle("Toast");
 		primaryStage.setResizable(false);
-		StackPane root = new StackPane();
-		root.setPrefSize(1000, 1000);
-		root.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 		highScoreTest();
-		if (!(HighScores.enoughHighScores())){
-			GridPane highScoreEntry = HighScores.highScoreEntry();
-			root.getChildren().add(highScoreEntry);
-		} else if (HighScores.higherScore(GameState.getScore())) {
-			GridPane highScoreEntry = HighScores.highScoreEntry();
-			root.getChildren().add(highScoreEntry);
-			HighScores.removeHighScore();
-		} else {
-			GridPane highScoresList = HighScores.displayHighScores(GameState.getTimestamp());
-			root.getChildren().add(highScoresList);
-		}
-		GameState.nameProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> o, String oldText, String newText) {
-				root.getChildren().clear();
-				HighScores.addHighScore(GameState.getName(), GameState.getScore(), GameState.getTimestamp());
-				GridPane highScoresList = HighScores.displayHighScores(GameState.getTimestamp());
-				root.getChildren().add(highScoresList);
-			}
-		});
-		Scene theScene = new Scene(root);
+		GameStage.getGameStage().addNode(GameStage.startScreen());
+		
+		
+		Scene theScene = new Scene(GameStage.getGameStage().getRoot());
 		primaryStage.setScene(theScene);
 
 		/*Canvas canvas = new Canvas(800, 800);
@@ -80,30 +60,10 @@ public class Main extends Application {
 		launch(args);
 	}
 	
-	public static GridPane startScreen() {
-		GridPane grid = new GridPane();
-		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(5, 5, 5, 5));
-		Label lblHighScoreMsg = new Label("Game Title");
-		lblHighScoreMsg.setFont(new Font(100));
-		Label lblNamePrompt = new Label("How to Play: \n"
-				+ "The object of this game is to defend the planet by shooting meteors before they make contact"
-				+ "Use the mouse to aim and click to fire"
-				+ "If the planet gets hit to many times the game will end");
-		Button btStart = new Button("Start");
-		btStart.setOnAction((event) -> {
-			
-		});
-		
-		return grid;
-	}
-	
 
 	// used to test score class
 	public static void highScoreTest() {
-		for (int i = 1; i < 1; i++)
-			GameState.asteroidDestroyed();
+		for (int i = 1; i < 10; i++)
+			GameState.getGameState().asteroidDestroyed();
 	}
 }
