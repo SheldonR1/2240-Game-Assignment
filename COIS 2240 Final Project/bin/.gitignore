@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /Main$Planet.class
 /GameState.class
 /HighScores.class
@@ -14,3 +15,17 @@
 /GUI.class
 /GUI$1.class
 /GUI$2.class
+=======
+/Main$1.class
+/Main$2.class
+/Main$3.class
+/Main$HighScores.class
+/Main.class
+/Player.class
+/Randomizer.class
+/Score.class
+/Enemy.class
+/bullets.class
+/planet.class
+/RangeFinder.class
+>>>>>>> Branch
