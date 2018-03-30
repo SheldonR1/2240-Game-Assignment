@@ -61,6 +61,11 @@ public final class GUI {
 		root.getChildren().add(grid);
 	}
 
+	private static void loadStatusDisplay() {
+		
+	}
+	
+	
 	// creates scene to get user to enter name
 	private static void loadNameEntry(StackPane root) {
 		addNameListener(root);																			 	// Creates listener for name entered flag
