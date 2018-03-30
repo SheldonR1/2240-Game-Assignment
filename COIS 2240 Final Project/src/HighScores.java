@@ -4,16 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
+import java.util.ArrayList;
+import java.util.Collections;
 
 // Class holding methods relating to HighScores SQLite database
 public final class HighScores {
@@ -38,7 +30,7 @@ public final class HighScores {
 		String sql = "INSERT INTO high_scores (name, score, timestamp) VALUES(?, ?, ?)";						// sql code to insert score into database
 		try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
 				PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setString(1, name);																				// load values into wildcards of prepared statement
+			ps.setString(1, name);																				// load values into wildcards of prepared statement and executes statement
 			ps.setInt(2, score);
 			ps.setLong(3, timestamp);
 			ps.executeUpdate();
@@ -94,70 +86,23 @@ public final class HighScores {
 		return false;																							// returns false otherwise
 	}
 
-	
-	public static GridPane highScoreEntry() {
-		GameState.addNameListener();
-		GridPane grid = new GridPane();
-		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(5, 5, 5, 5));
-		Label lblHighScoreMsg = new Label("New High Score");
-		lblHighScoreMsg.setFont(new Font(40));
-		Label lblNamePrompt = new Label("Enter Name: ");
-		Label lblInvalidName = new Label("Name must be 2-15 characters");
-		lblInvalidName.setVisible(false);
-		TextField nameTextField = new TextField();
-		nameTextField.setOnAction((event) -> {
-			if ((nameTextField.getText().length() > 15) || (nameTextField.getText().length() < 2)) {
-				lblInvalidName.setVisible(true);
-			} else {
-				GameState.getGameState().setName(nameTextField.getText());
-				GameState.getGameState().setNameEntered(true);
-			}
-		});
-		HBox hBox = new HBox();
-		hBox.getChildren().addAll(lblNamePrompt, nameTextField);
-		grid.add(lblHighScoreMsg, 0, 0);
-		grid.add(hBox, 0, 3);
-		grid.add(lblInvalidName, 0, 5);
-		return grid;
-	}
-
-	
-	public static GridPane displayHighScores(long timestamp) {
-		GridPane grid = new GridPane();
-		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(5, 5, 5, 5));
-		grid.getColumnConstraints().addAll(new ColumnConstraints(25), new ColumnConstraints(100), new ColumnConstraints(100));
-		int scorePos = 1;
-		Boolean newScore = false;
+	// loads high scores from database and returns them as 2D ArrayList
+	public static ArrayList<ArrayList<Object>> getHighScoreList() {
+		ArrayList<ArrayList<Object>> highScoresList = new ArrayList<ArrayList<Object>>();						// ArrayList to hold scores
 		String url = "jdbc:sqlite:HighScores.db";																// url of database
 		String sql = "SELECT name, score, timestamp FROM high_scores ORDER BY score DESC, timestamp ASC";		// sql code to return sorted scores from database
 		try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
 				Statement smt = conn.createStatement();
 				ResultSet rs = smt.executeQuery(sql)) {
-			while(rs.next()) {
-				newScore = (timestamp == rs.getLong("timestamp"));
-				grid.add(newScoreLabel(String.valueOf(scorePos), newScore), 0, scorePos);
-				grid.add(newScoreLabel(rs.getString("name"), newScore), 1, scorePos);
-				grid.add(newScoreLabel(String.valueOf(rs.getInt("score")), newScore), 2, scorePos);
-				scorePos++;
+			while(rs.next()) {																					// for each score retrieved from database, creates an ArrayList containing name/score/timestamp and adds it to highScoresList 
+				ArrayList<Object> score = new ArrayList<Object>();
+				Collections.addAll(score, rs.getString("name"), rs.getInt("score"), rs.getLong("timestamp"));
+				highScoresList.add(score);
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
-		return grid;
+		return highScoresList;																					// returns scores;
 	}
 
-	public static Label newScoreLabel(String text, Boolean newScore) {
-		Label lbl = new Label(text);
-		if (newScore == true)
-			lbl.setTextFill(Color.BLUE);
-		else
-			lbl.setTextFill(Color.RED);
-		return lbl;
-	}
 }

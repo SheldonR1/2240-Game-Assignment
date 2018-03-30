@@ -21,6 +21,7 @@ public final class GameState {
 	private SimpleBooleanProperty gameStarted;	// flag remove start screen/load game screen
 	private SimpleBooleanProperty gameEnded;	// flag to remove game screen and load name entry or high scores screen
 	private SimpleBooleanProperty nameEntered;	// flag to remove name entry screen and load high scores screen
+	// private constructor to initialize singleton and set base values
 	private GameState() {
 		startTime = System.nanoTime();
 		timestamp = System.currentTimeMillis();
@@ -85,56 +86,29 @@ public final class GameState {
 	public SimpleBooleanProperty nameEnteredProperty() {
 		return nameEntered;
 	}
+	
+	// Alter values when player destroys an asteroid
 	public void asteroidDestroyed() {
-		score += 100 * gameStage * combo;
-		combo += 1;
+		score += 100 * gameStage * combo;	// Increase score based on stage and combo
+		combo += 1;							// Increase combo and destroyed counter
 		numDest += 1;
-		if (numDest >= (gameStage * 10))
+		if (numDest >= (gameStage * 10))	// Destroyed counter high enough calls function to increase stage
 			upStage();
 	}
+	
+	// Alters values when asteroid hits planet
 	public void asteroidHit() {
-		combo = 1;
+		combo = 1;							// resets combo and decreases lives
 		lives--;
-		if (lives == 0)
+		if (lives == 0)						// if lives hits zero set flag for end of game to true
 			setGameEnded(true);
 	}
+	
+	// Alters values when stage increases
 	public void upStage() {
-		score += gameStage * 1000;
-		gameStage += 1;
+		score += gameStage * 1000;			// increase score based on stage
+		gameStage += 1;						// increases stage and lives, resets destroyed counter
 		lives++;
 		numDest = 0;
-	}
-	
-	public static void addGameListener() {
-		getGameState().gameEndedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> o, Boolean oldText, Boolean newText) {
-				GameStage.getGameStage().clearNodes();
-				if (!(HighScores.enoughHighScores())){
-					GridPane highScoreEntry = HighScores.highScoreEntry();
-					GameStage.getGameStage().addNode(highScoreEntry);
-				} else if (HighScores.higherScore(GameState.getGameState().getScore())) {
-					GridPane highScoreEntry = HighScores.highScoreEntry();
-					GameStage.getGameStage().addNode(highScoreEntry);
-					HighScores.removeHighScore();
-				} else {
-					GridPane highScoresList = HighScores.displayHighScores(GameState.getGameState().getTimestamp());
-					GameStage.getGameStage().addNode(highScoresList);
-				}
-			}
-		});
-	}
-	
-	public static void addNameListener() {
-		getGameState().nameEnteredProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> o, Boolean oldText, Boolean newText) {
-				GameStage.getGameStage().clearNodes();
-				HighScores.addHighScore(GameState.getGameState().getName(), GameState.getGameState().getScore(), GameState.getGameState().getTimestamp());
-				GridPane highScoresList = HighScores.displayHighScores(GameState.getGameState().getTimestamp());
-				GameStage.getGameStage().addNode(highScoresList);
-				GameState.getGameState().nameEnteredProperty().removeListener(this);
-			}
-		});
 	}
 }
