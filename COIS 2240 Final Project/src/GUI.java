@@ -1,15 +1,20 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundRepeat;
@@ -63,6 +68,76 @@ public final class GUI {
 
 	private static void loadStatusDisplay() {
 		
+	}
+	
+	public static void loadGame(StackPane root) {
+		Canvas canvas = new Canvas(1000, 1000);
+		root.getChildren().add(canvas);
+		
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		canvas.toBack();
+		Image circle = new Image("file:resources/Circle.png");     // sets the circle
+		Image planet = new Image("file:resources/earth.png", 150,150,true,true);      //sets planet
+	
+		Player playerData = new Player(new Image("file:resources/carsprite.png",150,75,true, true)); 
+		bullets projectile = new bullets(new Image("file:resources/bullet.png", 25,25,true,true));
+		RangeFinder rangefinder = new RangeFinder(500, 375);
+		
+				ArrayList<String> input = new ArrayList<String>();    //used to track the user's input
+			 
+				root.setOnKeyPressed(new EventHandler<KeyEvent>()  //Used to detect button presses and store the value
+			    		{
+			    	public void handle(KeyEvent e)                        
+			    	{
+			    		String code = e.getCode().toString();         //used to interpret button presses as a string value.
+			    			if (!input.contains(code))
+			    				{
+			    				input.add(code);						//used to ensure only one value is stored per press
+			    				}
+			    				
+			    	}
+			    		});
+			    root.setOnKeyReleased(new EventHandler<KeyEvent>()  //used to detect when the button has been released
+			    		{
+			    	public void handle(KeyEvent e)						
+			    	{
+			    		String code = e.getCode().toString();     //used to remove the code from the arraylist
+			    		input.remove(code);
+			    	}
+			    	
+			    		});
+			    
+		  new AnimationTimer()
+		    {
+		        public void handle(long currentNanoTime)
+		        {
+	
+		            
+		            //CIRCULAR MOVEMENT EQUATION
+		            
+		            if (input.contains("RIGHT"))   //EQUATIONS FOR MOVEMENT REQUIRED
+		            {
+		            	playerData.incPosCounter();
+		            	playerData.update();
+		            }
+		            else if (input.contains("LEFT")) //EQUATIONS FOR MOVEMENT REQUIRED
+		            {
+		            	playerData.decPosCounter();
+		            	playerData.update();
+			             
+		            }
+		            if (input.contains("SPACE"))
+		            {   double x = rangefinder.CalculateSlope(playerData.getPositionX() , playerData.getPositionY());
+		            	projectile.update(playerData.getPositionX(), playerData.getPositionY());				            	
+		            }
+		 
+		            // background image clears canvas
+		            gc.drawImage(planet, 500, 375);    //draws the circle 
+		            playerData.render(gc);
+		            
+		          
+		        }
+		    }.start();
 	}
 	
 	

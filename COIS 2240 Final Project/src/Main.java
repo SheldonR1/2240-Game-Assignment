@@ -29,115 +29,18 @@ public class Main extends Application {
 	public void start(Stage primaryStage) throws Exception{
 		primaryStage.setTitle("Toast");
 		
-		Pane root = new Pane();
-		Scene theScene = new Scene(root);
-		primaryStage.setScene(theScene);
-
-		Canvas canvas = new Canvas(1000, 1000);
-		root.getChildren().add(canvas);
-		primaryStage.setResizable(false);
-			
-		
-		GraphicsContext gc = canvas.getGraphicsContext2D();
-		canvas.toBack();
-		
-		Image background = new Image("file:resources/background.jpg"); //sets background
-		Image circle = new Image("file:resources/Circle.png");     // sets the circle
-		Image player = new Image("file:resources/carsprite.png",150,75,true, true); //sets player image as car
-		Image bullet = new Image("file:resources/bullet.png", 25,25,true,true);       //sets bullets
-		Image planet = new Image("file:resources/earth.png", 150,150,true,true);      //sets planet
-	
-		Player playerData = new Player(player); 
-		bullets projectile = new bullets(bullet);
-		RangeFinder rangefinder = new RangeFinder(500, 375);
-		
-					
-		
-				ArrayList<String> input = new ArrayList<String>();    //used to track the user's input
-			 
-				theScene.setOnKeyPressed(new EventHandler<KeyEvent>()  //Used to detect button presses and store the value
-			    		{
-			    	public void handle(KeyEvent e)                        
-			    	{
-			    		String code = e.getCode().toString();         //used to interpret button presses as a string value.
-			    			if (!input.contains(code))
-			    				{
-			    				input.add(code);						//used to ensure only one value is stored per press
-			    				}
-			    				
-			    	}
-			    		});
-			    theScene.setOnKeyReleased(new EventHandler<KeyEvent>()  //used to detect when the button has been released
-			    		{
-			    	public void handle(KeyEvent e)						
-			    	{
-			    		String code = e.getCode().toString();     //used to remove the code from the arraylist
-			    		input.remove(code);
-			    	}
-			    	
-			    		});
-			    
-				
-		 final long startNanoTime = System.nanoTime();
-       	
-		
-         
-		 
-		  new AnimationTimer()
-		    {
-		        public void handle(long currentNanoTime)
-		        {
-		            
-		        	
-		        //    gc.clearRect(0, 0, 1000,750);        //clears the canvas
-	
-		            
-		            //CIRCULAR MOVEMENT EQUATION
-		            
-		            if (input.contains("RIGHT"))   //EQUATIONS FOR MOVEMENT REQUIRED
-		            {
-		            	playerData.incPosCounter();
-		            	playerData.update();
-		            }
-		            else if (input.contains("LEFT")) //EQUATIONS FOR MOVEMENT REQUIRED
-		            {
-		            	playerData.decPosCounter();
-		            	playerData.update();
-			             
-		            }
-		            if (input.contains("SPACE"))
-		            {   double x = rangefinder.CalculateSlope(playerData.getPositionX() , playerData.getPositionY());
-		            	projectile.update(playerData.getPositionX(), playerData.getPositionY());				            	
-		            }
-		 
-		            // background image clears canvas
-					
-		            gc.drawImage(background, 0, 0);     //draws the canvas
-		            gc.drawImage(planet, 500, 375);    //draws the circle 
-		             playerData.render(gc);
-		            gc.drawImage(bullet, 300, 375);
-		            
-		          
-		        }
-		    }.start();
-		    
-		 primaryStage.show();
-
-		
-		/*HighScores.checkDatabase();
+		HighScores.checkDatabase();
 		primaryStage.setTitle("Toast");
 		primaryStage.setResizable(false);
 		StackPane root = new StackPane();
 		root.setPrefSize(1000, 1000);
 		root.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-		GUI.loadStart(root);
-		highScoreTest();
-
-
 		Scene theScene = new Scene(root);
 		primaryStage.setScene(theScene);
-
-		primaryStage.show();*/
+		primaryStage.show();
+		GUI.loadGame(root);
+		//GUI.loadStart(root);
+		highScoreTest();
 	}
 
 	public static void main(String[] args) {
