@@ -14,7 +14,6 @@ public class Main extends Application {
 		StackPane root = new StackPane();
 		root.setPrefSize(1000, 1000);
 		root.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-		//root.setBackground();
 		GUI.loadStart(root);
 		highScoreTest();
 

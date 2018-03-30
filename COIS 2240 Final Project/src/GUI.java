@@ -9,6 +9,10 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -24,9 +28,9 @@ public final class GUI {
 	//private construction to prevent instantiation
 	private GUI() {
 	}
-	
 	// creates start scene
 	public static void loadStart(StackPane root) {
+		root.setBackground(new Background(new BackgroundImage(new Image ("file:resources/background.jpg"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, null, null)));	// loads/sets background image
 		GridPane grid = new GridPane();																		// Creates and formats GridPane to hold scene elements
 		grid.setHgap(10);
 		grid.setVgap(10);
@@ -35,6 +39,7 @@ public final class GUI {
 		grid.getRowConstraints().addAll(new RowConstraints(300),  new RowConstraints(75), new RowConstraints(200));
 		Label lblTitle = new Label("Game Title");															// Creates and formats labels to display title/instructions
 		lblTitle.setFont(new Font(100));
+		lblTitle.setTextFill(Color.DARKRED);
 		Label lblInstruct = new Label("How to Play: \n"
 				+ "The object of this game is to defend the planet by shooting meteors before they make contact\n"
 				+ "Use the mouse to aim and left click to fire\n"
@@ -42,6 +47,7 @@ public final class GUI {
 				+ "If the planet gets hit to many times the game will end");
 		lblInstruct.setTextAlignment(TextAlignment.CENTER);
 		lblInstruct.setFont(new Font(20));
+		lblInstruct.setTextFill(Color.AQUAMARINE);
 		Button btStart = new Button("Start");																// Creates/formats button and defines event for button click
 		btStart.setPrefSize(200, 100);
 		btStart.setOnAction((event) -> {
@@ -118,14 +124,14 @@ public final class GUI {
 		lblName.setFont(new Font(25));
 		lblScore.setFont(new Font(25));
 		if (newScore == true) {																				// Sets font colour depending on whether score was new
-			lblPos.setTextFill(Color.BLUE);
-			lblName.setTextFill(Color.BLUE);
-			lblScore.setTextFill(Color.BLUE);
+			lblPos.setTextFill(Color.DARKRED);
+			lblName.setTextFill(Color.DARKRED);
+			lblScore.setTextFill(Color.DARKRED);
 		}
 		else {
-			lblPos.setTextFill(Color.RED);
-			lblName.setTextFill(Color.RED);
-			lblScore.setTextFill(Color.RED);
+			lblPos.setTextFill(Color.CHARTREUSE);
+			lblName.setTextFill(Color.CHARTREUSE);
+			lblScore.setTextFill(Color.CHARTREUSE);
 		}
 		ArrayList<Label> scoreLabels = new ArrayList<Label>();												// loads labels into new ArrayList and returns them
 		Collections.addAll(scoreLabels, lblPos, lblName, lblScore);

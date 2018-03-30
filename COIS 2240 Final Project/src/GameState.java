@@ -1,10 +1,4 @@
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.layout.GridPane;
 
 // Lazy singleton class containing various fields and methods relation to the gamestate 
 public final class GameState {
