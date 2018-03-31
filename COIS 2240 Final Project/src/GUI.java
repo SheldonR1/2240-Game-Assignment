@@ -102,13 +102,16 @@ public final class GUI {
 		root.getChildren().add(canvas);
 		loadStatusDisplay(root);
 
+		Image background = new Image("file:resources/background.jpg");
+		Image planet = new Image("file:resources/earth.png", 150,150,true,true);
+		Player player = new Player();
+		ArrayList<Missile> missiles = new ArrayList<Missile>();  // Arraylist containing all missile objects in the game at any point in time
+		ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
 
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 
 		theScene.setOnKeyPressed(new EventHandler<KeyEvent>() { //Used to detect button presses and store the value
-
-			public void handle(KeyEvent e)                        
-			{
+			public void handle(KeyEvent e) {
 				switch (e.getCode()) {
 				case LEFT: GameState.getGameState().setMovingLeft(true); break;
 				case RIGHT: GameState.getGameState().setMovingRight(true); break;
@@ -120,9 +123,7 @@ public final class GUI {
 			}
 		});
 		theScene.setOnKeyReleased(new EventHandler<KeyEvent>() { //used to detect when the button has been released
-
-			public void handle(KeyEvent e)                        
-			{
+			public void handle(KeyEvent e) {
 				switch (e.getCode()) {
 				case LEFT: GameState.getGameState().setMovingLeft(false); break;
 				case RIGHT: GameState.getGameState().setMovingRight(false); break;
@@ -131,44 +132,77 @@ public final class GUI {
 				}
 			}
 		});
-
-		new AnimationTimer()
-		{
-			public void handle(long currentNanoTime)
-			{
-				if (GameState.getGameState().getMovingRight())   //EQUATIONS FOR MOVEMENT REQUIRED
-				{
-					GameState.getGameState().getPlayer().incPosCounter();
-					GameState.getGameState().getPlayer().update();
+		new AnimationTimer() {
+			public void handle(long currentNanoTime) {
+				if (GameState.getGameState().getMovingRight()) {
+					player.incPosCounter();
+					player.update();
 				}
-				if (GameState.getGameState().getMovingLeft()) //EQUATIONS FOR MOVEMENT REQUIRED
-				{
-					GameState.getGameState().getPlayer().decPosCounter();
-					GameState.getGameState().getPlayer().update();
+				if (GameState.getGameState().getMovingLeft()) {
+					player.decPosCounter();
+					player.update();
 				}
-				if (GameState.getGameState().getFiring() && GameState.getGameState().getCooldown() <= 0)
-				{   
-					GameState.getGameState().addProjectile(new Missile(GameState.getGameState().getPlayer()));
-					GameState.getGameState().resetCooldown();
+				if (GameState.getGameState().getFiring() && GameState.getGameState().getMissileCooldown() <= 0) {   
+					missiles.add(new Missile(player));
+					GameState.getGameState().resetMissileCooldown();
 				}
-
+				if (GameState.getGameState().getAsteroidCooldown() <= 0) {
+					asteroids.add(new Asteroid());
+					GameState.getGameState().resetAsteroidCooldown();
+				}
 				// background image clears canvas
-				gc.drawImage(GameState.getGameState().getBackground(), 0, 0);     //draws the canvas
-				gc.drawImage(GameState.getGameState().getPlanet(), 500-75, 500-75);    //draws the circle 
-				GameState.getGameState().getPlayer().render(gc);
-				Iterator<Missile> missileIter = GameState.getGameState().getProjectilesIter();
-				while (missileIter.hasNext()) {
-					Missile missile = missileIter.next();
-					missile.render(gc);
-					if (missile.getPositionX() > 1000 || missile.getPositionY() > 1000 || missile.getPositionX() < 1 || missile.getPositionY() < 1)
-						missileIter.remove();
-				}
-				GameState.getGameState().decCooldown();
+				gc.drawImage(background, 0, 0);     //draws the canvas
+				gc.drawImage(planet, 500-75, 500-75);    //draws the circle 
+				player.render(gc);
+				
+				updateMissiles(gc, missiles.iterator());
+				updateAsteroids(gc, asteroids.iterator());
+				checkCollisions(missiles.iterator(), asteroids.iterator());
+				
+				
+				GameState.getGameState().decMissileCooldown();
+				GameState.getGameState().decAsteroidCooldown();
 			}
 		}.start();
 	}
-
 	
+	private static void updateMissiles(GraphicsContext gc, Iterator<Missile> missileIter) {
+		while (missileIter.hasNext()) {
+			Missile missile = missileIter.next();
+			missile.render(gc);
+			if (missile.getPositionX() > 1000 || missile.getPositionY() > 1000 || missile.getPositionX() < 0 || missile.getPositionY() < 0)
+				missileIter.remove();
+		}
+	}
+	
+	private static void updateAsteroids(GraphicsContext gc, Iterator<Asteroid> asteroidIter) {
+		while (asteroidIter.hasNext()) {
+			Asteroid asteroid = asteroidIter.next();
+			asteroid.render(gc);
+			if (asteroid.getPositionX() <= 575 && asteroid.getPositionX() >= 425 && asteroid.getPositionY() <= 575 && asteroid.getPositionY() >= 425) {
+				asteroidIter.remove();
+				GameState.getGameState().asteroidHit();
+			} else if (asteroid.getPositionX() > 1000 || asteroid.getPositionY() > 1000 || asteroid.getPositionX() < 0 || asteroid.getPositionY() < 0) {
+				asteroidIter.remove();
+			}
+		}
+	}
+
+	private static void checkCollisions(Iterator<Missile> missileIter, Iterator<Asteroid> asteroidIter) {
+		while (missileIter.hasNext()) {
+			Missile missile = missileIter.next();
+			while (asteroidIter.hasNext()) {
+				Asteroid asteroid = asteroidIter.next();
+
+				if(missile.intersects(asteroid)) {
+					asteroidIter.remove();
+					missileIter.remove();
+					GameState.getGameState().asteroidDestroyed();
+				}
+			}
+		}
+	}
+
 	// creates scene to get user to enter name
 	private static void loadNameEntry(StackPane root) {
 		addNameListener(root);																			 	// Creates listener for name entered flag
