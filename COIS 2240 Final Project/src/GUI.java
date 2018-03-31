@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -8,12 +9,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -67,79 +70,120 @@ public final class GUI {
 	}
 
 	private static void loadStatusDisplay() {
-		
+
 	}
-	
-	public static void loadGame(StackPane root) {
+
+	public static void loadGame(Scene theScene, StackPane root) {
 		Canvas canvas = new Canvas(1000, 1000);
 		root.getChildren().add(canvas);
-		
+
+
 		GraphicsContext gc = canvas.getGraphicsContext2D();
-		canvas.toBack();
-		Image circle = new Image("file:resources/Circle.png");     // sets the circle
+
+		Image background = new Image("file:resources/background.jpg"); //sets background
 		Image planet = new Image("file:resources/earth.png", 150,150,true,true);      //sets planet
-	
-		Player playerData = new Player(new Image("file:resources/carsprite.png",150,75,true, true)); 
-		bullets projectile = new bullets(new Image("file:resources/bullet.png", 25,25,true,true));
-		RangeFinder rangefinder = new RangeFinder(500, 375);
+		Player player = new Player(); 
+
+		theScene.setOnKeyPressed(new EventHandler<KeyEvent>() { //Used to detect button presses and store the value
+
+			public void handle(KeyEvent e)                        
+			{
+				switch (e.getCode()) {
+				case LEFT: GameState.getGameState().setMovingLeft(true); break;
+				case RIGHT: GameState.getGameState().setMovingRight(true); break;
+				case SPACE: GameState.getGameState().setFiring(true); break;
+				default: break;
+				}
+			}
+		});
+		theScene.setOnKeyReleased(new EventHandler<KeyEvent>() { //used to detect when the button has been released
+
+			public void handle(KeyEvent e)                        
+			{
+				switch (e.getCode()) {
+				case LEFT: GameState.getGameState().setMovingLeft(false); break;
+				case RIGHT: GameState.getGameState().setMovingRight(false); break;
+				case SPACE: GameState.getGameState().setFiring(false); break;
+				default: break;
+				}
+			}
+		});
+
+		new AnimationTimer()
+		{
+			public void handle(long currentNanoTime)
+			{
+				if (GameState.getGameState().getMovingRight())   //EQUATIONS FOR MOVEMENT REQUIRED
+				{
+					player.incPosCounter();
+					player.update();
+				}
+				if (GameState.getGameState().getMovingLeft()) //EQUATIONS FOR MOVEMENT REQUIRED
+				{
+					player.decPosCounter();
+					player.update();
+
+				}
+				if (GameState.getGameState().getFiring() && GameState.getGameState().getCooldown() <= 0)
+				{   
+					GameState.getGameState().addProjectile(new Missile(player));
+					GameState.getGameState().resetCooldown();
+				}
+
+				// background image clears canvas
+
+				gc.drawImage(background, 0, 0);     //draws the canvas
+				gc.drawImage(planet, 500-75, 500-75);    //draws the circle 
+				player.render(gc);
+				Iterator<Missile> missileIter = GameState.getGameState().getProjectilesIter();
+				while (missileIter.hasNext()) {
+					Missile missile = missileIter.next();
+					missile.render(gc);
+					if (missile.getPositionX() > 1000 || missile.getPositionY() > 1000 || missile.getPositionX() < 1 || missile.getPositionY() < 1)
+						missileIter.remove();
+				}
+				GameState.getGameState().decCooldown();
+
+
+
+
+
+			}
+		}.start();
 		
-				ArrayList<String> input = new ArrayList<String>();    //used to track the user's input
-			 
-				root.setOnKeyPressed(new EventHandler<KeyEvent>()  //Used to detect button presses and store the value
-			    		{
-			    	public void handle(KeyEvent e)                        
-			    	{
-			    		String code = e.getCode().toString();         //used to interpret button presses as a string value.
-			    			if (!input.contains(code))
-			    				{
-			    				input.add(code);						//used to ensure only one value is stored per press
-			    				}
-			    				
-			    	}
-			    		});
-			    root.setOnKeyReleased(new EventHandler<KeyEvent>()  //used to detect when the button has been released
-			    		{
-			    	public void handle(KeyEvent e)						
-			    	{
-			    		String code = e.getCode().toString();     //used to remove the code from the arraylist
-			    		input.remove(code);
-			    	}
-			    	
-			    		});
-			    
-		  new AnimationTimer()
-		    {
-		        public void handle(long currentNanoTime)
-		        {
-	
-		            
-		            //CIRCULAR MOVEMENT EQUATION
-		            
-		            if (input.contains("RIGHT"))   //EQUATIONS FOR MOVEMENT REQUIRED
-		            {
-		            	playerData.incPosCounter();
-		            	playerData.update();
-		            }
-		            else if (input.contains("LEFT")) //EQUATIONS FOR MOVEMENT REQUIRED
-		            {
-		            	playerData.decPosCounter();
-		            	playerData.update();
-			             
-		            }
-		            if (input.contains("SPACE"))
-		            {   double x = rangefinder.CalculateSlope(playerData.getPositionX() , playerData.getPositionY());
-		            	projectile.update(playerData.getPositionX(), playerData.getPositionY());				            	
-		            }
-		 
-		            // background image clears canvas
-		            gc.drawImage(planet, 500, 375);    //draws the circle 
-		            playerData.render(gc);
-		            
-		          
-		        }
-		    }.start();
+		/*
+
+
+
+
+		new AnimationTimer()
+		{
+			public void handle(long currentNanoTime)
+			{
+				//    gc.clearRect(0, 0, 1000,750);        //clears the canvas
+
+				//CIRCULAR MOVEMENT EQUATION
+
+				if (GameState.getGameState().getMovingRight())   //EQUATIONS FOR MOVEMENT REQUIRED
+				{
+					player.incPosCounter();
+					player.update();
+				}
+				else if (GameState.getGameState().getMovingRight()) //EQUATIONS FOR MOVEMENT REQUIRED
+				{
+					player.decPosCounter();
+					player.update();
+
+				}
+				if (GameState.getGameState().getMovingRight() && GameState.getGameState().getCooldown() <= 0)
+				{   
+					GameState.getGameState().addProjectile(new Missile(player));
+					GameState.getGameState().resetCooldown();
+				}
+
+				*/
 	}
-	
+
 	
 	// creates scene to get user to enter name
 	private static void loadNameEntry(StackPane root) {

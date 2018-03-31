@@ -4,7 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class Player {
 
-	private Image player;
+	private Image sprite;
     private double positionX;
     private double positionY;  
     private double width; 
@@ -12,26 +12,28 @@ public class Player {
     private double posCounter;
     private double rotation;
     
-    public Player(Image player)
+    public Player()
     {  
-    	positionX = 232;
-    	positionY = 232;
-    	this.player = player;
+    	positionX = 500 + 128;
+    	positionY = 500;
+    	sprite = new Image("file:resources/carsprite.png",40,80,true, true);
+    	System.out.println(sprite.getHeight());
+    	System.out.println(sprite.getWidth());
     	posCounter = 0;
     
     	
     
     }
     public void update() {
-    	setPositionX(232 + 128 * Math.cos(Math.toDegrees(posCounter))); 
-    	setPositionY(232 + 128 * Math.sin(Math.toDegrees(posCounter)));
+    	setPositionX(500 + 128 * Math.cos(Math.toDegrees(posCounter))); 
+    	setPositionY(500 + 128 * Math.sin(Math.toDegrees(posCounter)));
     	
 
     }
     
       public void render(GraphicsContext gc)
      {
-    	    gc.drawImage(player, positionX, positionY);
+    	    gc.drawImage(sprite, positionX - 20, positionY - 40);
     }
     public Rectangle2D getBoundary()
     {

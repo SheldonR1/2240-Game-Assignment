@@ -37,10 +37,11 @@ public class Main extends Application {
 		root.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 		Scene theScene = new Scene(root);
 		primaryStage.setScene(theScene);
-		primaryStage.show();
-		GUI.loadGame(root);
+		GUI.loadGame(theScene, root);
 		//GUI.loadStart(root);
 		highScoreTest();
+
+		primaryStage.show();
 	}
 
 	public static void main(String[] args) {
