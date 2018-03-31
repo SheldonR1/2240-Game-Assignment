@@ -36,9 +36,8 @@ public class Main extends Application {
 		root.setPrefSize(1000, 1000);
 		root.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 		Scene theScene = new Scene(root);
+		GUI.loadStart(theScene, root);
 		primaryStage.setScene(theScene);
-		GUI.loadGame(theScene, root);
-		//GUI.loadStart(root);
 		highScoreTest();
 
 		primaryStage.show();

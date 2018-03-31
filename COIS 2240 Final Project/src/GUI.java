@@ -37,7 +37,7 @@ public final class GUI {
 	private GUI() {
 	}
 	// creates start scene
-	public static void loadStart(StackPane root) {
+	public static void loadStart(Scene theScene, StackPane root) {
 		root.setBackground(new Background(new BackgroundImage(new Image ("file:resources/background.jpg"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, null, null)));	// loads/sets background image
 		GridPane grid = new GridPane();																		// Creates and formats GridPane to hold scene elements
 		grid.setHgap(10);
@@ -59,9 +59,8 @@ public final class GUI {
 		Button btStart = new Button("Start");																// Creates/formats button and defines event for button click
 		btStart.setPrefSize(200, 100);
 		btStart.setOnAction((event) -> {
-			root.getChildren().clear();																		// clears previous scene and adds listener for game finish flag
-			addGameListener(root);
-			GameState.getGameState().setGameEnded(true);
+			root.getChildren().clear();																		// clears previous scene and loads game scene
+			loadGame(theScene, root);
 		});
 		grid.add(lblTitle, 2, 1, 3, 1);																		// Loads elements into GridPane and adds GridPane to root to display
 		grid.add(lblInstruct, 1, 2, 5, 1);
@@ -74,6 +73,7 @@ public final class GUI {
 	}
 
 	public static void loadGame(Scene theScene, StackPane root) {
+		addGameListener(root);
 		Canvas canvas = new Canvas(1000, 1000);
 		root.getChildren().add(canvas);
 
@@ -92,6 +92,8 @@ public final class GUI {
 				case LEFT: GameState.getGameState().setMovingLeft(true); break;
 				case RIGHT: GameState.getGameState().setMovingRight(true); break;
 				case SPACE: GameState.getGameState().setFiring(true); break;
+				case UP: GameState.getGameState().asteroidDestroyed(); break;
+				case DOWN: GameState.getGameState().asteroidHit(); break;
 				default: break;
 				}
 			}
@@ -197,6 +199,9 @@ public final class GUI {
 		lblHighScoreMsg.setFont(new Font(40));
 		Label lblNamePrompt = new Label("Enter Name: ");
 		Label lblInvalidName = new Label("Name must be 2-15 characters");
+		lblHighScoreMsg.setTextFill(Color.AQUAMARINE);
+		lblNamePrompt.setTextFill(Color.AQUAMARINE);
+		lblInvalidName.setTextFill(Color.RED);
 		lblInvalidName.setVisible(false);
 		TextField nameTextField = new TextField();															// Creates text field for name entry and defines event for pressing enter
 		nameTextField.setOnAction((event) -> {
