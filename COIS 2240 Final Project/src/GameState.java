@@ -48,7 +48,7 @@ public final class GameState {
 	public int getScore() {
 		return score;
 	}
-	public int getGameStage() {
+	public int getStage() {
 		return gameStage;
 	}
 	public int getCombo() {
@@ -146,4 +146,7 @@ public final class GameState {
 		lives++;
 		numDest = 0;
 	}
+	
+	
+	
 }

@@ -40,9 +40,9 @@ public class Player {
     	return new Rectangle2D(positionX, positionY, width, height);
     }
     
-    public boolean intersects(Player Car)
+    public boolean intersects(Enemy A)
     {
-    	return Car.getBoundary().intersects(this.getBoundary());
+    	return A.getBoundary().intersects(this.getBoundary());
     }
 
 	public double getPositionX() {

@@ -3,8 +3,9 @@ public class Randomizer {
 
 	
 	private int side; 
-	private int Xpos; 
-	private int Ypos; 
+	private double Xpos; 
+	private double Ypos; 
+	private double stage; 
 	
 	public Randomizer()
 	{
@@ -47,14 +48,13 @@ public class Randomizer {
 		}
 		
 	}
-	public int getX()		                     //Used to return the X values generated from SpawnEnemy()
+	public double getX()		                     //Used to return the X values generated from SpawnEnemy()
 	{
 		return Xpos;
 	}
-	public int getY()                           //Used to return the Y values generated from SpawnEnemy()
+	public double getY()                           //Used to return the Y values generated from SpawnEnemy()
 	{
 		return Ypos;
 	}
 	
-		
 }

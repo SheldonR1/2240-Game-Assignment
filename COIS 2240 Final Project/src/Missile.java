@@ -43,9 +43,10 @@ public class Missile {
     	return new Rectangle2D(positionX, positionY, width, height);
     }
     
-    public boolean intersects(Missile shot)
-    {
-    	return shot.getBoundary().intersects(this.getBoundary());
+    public boolean intersects(Enemy target)
+    { 
+    	
+    	return target.getBoundary().intersects(this.getBoundary());
     }
     public double getPositionX()
     {  

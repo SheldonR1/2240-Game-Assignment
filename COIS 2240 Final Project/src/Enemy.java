@@ -3,37 +3,57 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 public class Enemy {
-	private Image Enemy;
+	private Image sprite;
     private double positionX;
     private double positionY;
-    private double speed;
+    private double Xval;
+    private double Yval;
+    private double newXpos; 
+    private double newYpos; 
+    private double speedX = 1;
+    private double direction;
+    private double speedY = 1;
     private double width; 
     private double height;
     
-    public Enemy(double speed, double positionX, double positionY, Image Enemy)
+    
+    public Enemy()
     {  
-    	this.positionX = positionX;
-    	this.positionY = positionY;
-    	this.Enemy = Enemy; 
+    	sprite = new Image("file:resources/Circle.png",50,50,true,true); 
     }
     
-    public void update(double time)
+    public void update()
     {
-    	positionX += speed*time; 
-    	positionY += speed*time; 
+    	direction = Math.atan(((425-Yval))/((425-Xval)));
+    	newXpos = (this.positionX + (speedX*Math.cos(direction)));
+    	newYpos = (this.positionY + (speedY*Math.cos(direction)));
     }
     public void render(GraphicsContext gc)
     {
-    gc.drawImage(Enemy, positionX, positionY);
+    update();	
+    gc.drawImage(sprite, newXpos, newYpos);
     }
     public Rectangle2D getBoundary()
     {
     	return new Rectangle2D(positionX, positionY, width, height);
     }
     
-    public boolean intersects(Enemy A)
-    {
+    public boolean intersects(Missile A)
+    {   
+    	
     	return A.getBoundary().intersects(this.getBoundary());
+    	
+    }
+    public void setpositionX(double posX)
+    {
+    	this.positionX = posX;
+    	this.Xval = posX;
+    }
+   
+    public void setpositionY(double posY)
+    {
+    	this.positionY = posY;
+    	this.Yval = posY;
     }
     
     }    

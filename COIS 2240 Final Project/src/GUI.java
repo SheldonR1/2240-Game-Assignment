@@ -45,8 +45,8 @@ public final class GUI {
 		grid.setPadding(new Insets(5, 5, 5, 5));
 		grid.getColumnConstraints().addAll(new ColumnConstraints (100), new ColumnConstraints(175), new ColumnConstraints(100), new ColumnConstraints(500));
 		grid.getRowConstraints().addAll(new RowConstraints(300),  new RowConstraints(75), new RowConstraints(200));
-		Label lblTitle = new Label("Game Title");															// Creates and formats labels to display title/instructions
-		lblTitle.setFont(new Font(100));
+		Label lblTitle = new Label("TESLAS IN SPACE");															// Creates and formats labels to display title/instructions
+		lblTitle.setFont(new Font(90));
 		lblTitle.setTextFill(Color.DARKRED);
 		Label lblInstruct = new Label("How to Play: \n"
 				+ "The object of this game is to defend the planet by shooting meteors before they make contact\n"
@@ -83,6 +83,8 @@ public final class GUI {
 		Image background = new Image("file:resources/background.jpg"); //sets background
 		Image planet = new Image("file:resources/earth.png", 150,150,true,true);      //sets planet
 		Player player = new Player(); 
+		Enemy astroid = new Enemy();
+		Randomizer rndm = new Randomizer();
 
 		theScene.setOnKeyPressed(new EventHandler<KeyEvent>() { //Used to detect button presses and store the value
 
@@ -131,12 +133,29 @@ public final class GUI {
 					GameState.getGameState().addProjectile(new Missile(player));
 					GameState.getGameState().resetCooldown();
 				}
+				if (GameState.getGameState().getStage() > GameState.getGameState().getNumDest())
+				{
+				 int x = 1; 
+				 if (x == 1)
+				 {
+					rndm.SpawnEnemy();
+					astroid.setpositionX(rndm.getX());
+					astroid.setpositionY(rndm.getY());	
+					x++;
+				 }
+				 
+				}
+				
 
+				
+				
+				
 				// background image clears canvas
-
 				gc.drawImage(background, 0, 0);     //draws the canvas
 				gc.drawImage(planet, 500-75, 500-75);    //draws the circle 
 				player.render(gc);
+				astroid.render(gc);
+				
 				Iterator<Missile> missileIter = GameState.getGameState().getProjectilesIter();
 				while (missileIter.hasNext()) {
 					Missile missile = missileIter.next();
