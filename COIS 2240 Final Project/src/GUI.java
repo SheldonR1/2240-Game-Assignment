@@ -4,6 +4,9 @@ import java.util.Iterator;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.NumberBinding;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -68,14 +71,39 @@ public final class GUI {
 		root.getChildren().add(grid);
 	}
 
-	private static void loadStatusDisplay() {
-
+	private static void loadStatusDisplay(StackPane root) {
+		Label lblScore = new Label();
+		Label lblCombo = new Label();
+		Label lblStage = new Label();
+		Label lblLives = new Label();
+		lblScore.textProperty().bind(Bindings.concat("Score: ", GameState.getGameState().getScoreProperty().asString()));
+		lblCombo.textProperty().bind(Bindings.concat("Combo: ", GameState.getGameState().getComboProperty().asString()));
+		lblStage.textProperty().bind(Bindings.concat("Stage: ", GameState.getGameState().getGameStageProperty().asString()));
+		lblLives.textProperty().bind(Bindings.concat("Lives: ", GameState.getGameState().getLivesProperty().asString()));
+		lblScore.setFont(new Font(25));
+		lblCombo.setFont(new Font(25));
+		lblStage.setFont(new Font(25));
+		lblLives.setFont(new Font(25));
+		lblScore.setTextFill(Color.AQUAMARINE);
+		lblCombo.setTextFill(Color.AQUAMARINE);
+		lblStage.setTextFill(Color.AQUAMARINE);
+		lblLives.setTextFill(Color.AQUAMARINE);
+		GridPane grid = new GridPane();
+		grid.getColumnConstraints().addAll(new ColumnConstraints (300), new ColumnConstraints(300), new ColumnConstraints(300));
+		grid.add(lblScore, 0, 0);
+		grid.add(lblCombo, 1, 0);
+		grid.add(lblStage, 2, 0);
+		grid.add(lblLives, 3, 0);
+		root.getChildren().add(grid);
 	}
+	
+	
 
 	public static void loadGame(Scene theScene, StackPane root) {
 		addGameListener(root);
 		Canvas canvas = new Canvas(1000, 1000);
 		root.getChildren().add(canvas);
+		loadStatusDisplay(root);
 
 
 		GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -124,7 +152,6 @@ public final class GUI {
 				{
 					player.decPosCounter();
 					player.update();
-
 				}
 				if (GameState.getGameState().getFiring() && GameState.getGameState().getCooldown() <= 0)
 				{   
@@ -133,7 +160,6 @@ public final class GUI {
 				}
 
 				// background image clears canvas
-
 				gc.drawImage(background, 0, 0);     //draws the canvas
 				gc.drawImage(planet, 500-75, 500-75);    //draws the circle 
 				player.render(gc);
@@ -145,45 +171,8 @@ public final class GUI {
 						missileIter.remove();
 				}
 				GameState.getGameState().decCooldown();
-
-
-
-
-
 			}
 		}.start();
-		
-		/*
-
-
-
-
-		new AnimationTimer()
-		{
-			public void handle(long currentNanoTime)
-			{
-				//    gc.clearRect(0, 0, 1000,750);        //clears the canvas
-
-				//CIRCULAR MOVEMENT EQUATION
-
-				if (GameState.getGameState().getMovingRight())   //EQUATIONS FOR MOVEMENT REQUIRED
-				{
-					player.incPosCounter();
-					player.update();
-				}
-				else if (GameState.getGameState().getMovingRight()) //EQUATIONS FOR MOVEMENT REQUIRED
-				{
-					player.decPosCounter();
-					player.update();
-
-				}
-				if (GameState.getGameState().getMovingRight() && GameState.getGameState().getCooldown() <= 0)
-				{   
-					GameState.getGameState().addProjectile(new Missile(player));
-					GameState.getGameState().resetCooldown();
-				}
-
-				*/
 	}
 
 	
@@ -266,7 +255,7 @@ public final class GUI {
 		Collections.addAll(scoreLabels, lblPos, lblName, lblScore);
 		return scoreLabels;
 	}
-
+	
 	// creates listener that transitions to next scene after game finishes
 	private static void addGameListener(StackPane root) {
 		GameState.getGameState().gameEndedProperty().addListener(new ChangeListener<Boolean>() {			// adds change listener to gameEnded property

@@ -3,11 +3,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 
-import javafx.geometry.Rectangle2D;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-
-
 public class Missile {
 	private double positionX;
     private double positionY;  
@@ -27,7 +22,6 @@ public class Missile {
     	System.out.println(velX);
     	System.out.println(velY);
     }
-    
     public void update()
     {
     	positionX += velX/50;

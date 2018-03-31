@@ -2,36 +2,37 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
 // Lazy singleton class containing various fields and methods relation to the gamestate 
 public final class GameState {
 	private static GameState gameState = null;
-	
 	private final long timestamp;				// unix timestamp used to determine order of equal high scores
-	private int score;							// current score
-	private int gameStage;						// score/difficulty multiplier
-	private int lives;							// remaining lives
-	private int combo;							// score multiplier
+	private SimpleIntegerProperty score;							// current score
+	private SimpleIntegerProperty gameStage;						// score/difficulty multiplier
+	private SimpleIntegerProperty lives;							// remaining lives
+	private SimpleIntegerProperty combo;							// score multiplier
 	private int numDest;						// counter for destroyed asteroids
 	private int cooldown;						// cooldown for shooting
 	private Boolean movingLeft;
 	private Boolean movingRight;
 	private Boolean firing;	
 	private String name;						// user's name
-	ArrayList<Missile> missiles = new ArrayList<Missile>(); // Arraylist containing all missile objects in the game at any point in time
+	private ArrayList<Missile> missiles; // Arraylist containing all missile objects in the game at any point in time
 	private SimpleBooleanProperty gameStarted;	// flag remove start screen/load game screen
 	private SimpleBooleanProperty gameEnded;	// flag to remove game screen and load name entry or high scores screen
 	private SimpleBooleanProperty nameEntered;	// flag to remove name entry screen and load high scores screen
 	// private constructor to initialize singleton and set base values
 	private GameState() {
 		timestamp = System.currentTimeMillis();
-		score = 0;
-		gameStage = 1;
-		lives = 10;
-		combo = 1;
+		score = new SimpleIntegerProperty(0);
+		gameStage = new SimpleIntegerProperty(1);
+		lives = new SimpleIntegerProperty(10);
+		combo = new SimpleIntegerProperty(1);
 		numDest = 0;
 		cooldown = 0;
 		name = "";
+		missiles = new ArrayList<Missile>();
 		movingLeft = false;
 		movingRight = false;
 		firing = false;	
@@ -46,13 +47,28 @@ public final class GameState {
 		return gameState;
 	}
 	public int getScore() {
+		return score.get();
+	}
+	public SimpleIntegerProperty getScoreProperty() {
 		return score;
 	}
 	public int getGameStage() {
+		return gameStage.get();
+	}
+	public SimpleIntegerProperty getGameStageProperty() {
 		return gameStage;
 	}
 	public int getCombo() {
+		return combo.get();
+	}
+	public SimpleIntegerProperty getComboProperty() {
 		return combo;
+	}
+	public int getLives() {
+		return lives.get();
+	}
+	public SimpleIntegerProperty getLivesProperty() {
+		return lives;
 	}
 	public int getNumDest() {
 		return numDest;
@@ -63,9 +79,7 @@ public final class GameState {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public int getLives() {
-		return lives;
-	}
+	
 	public long getTimestamp( ) {
 		return timestamp;
 	}
@@ -124,26 +138,26 @@ public final class GameState {
 	
 	// Alter values when player destroys an asteroid
 	public void asteroidDestroyed() {
-		score += 100 * gameStage * combo;	// Increase score based on stage and combo
-		combo += 1;							// Increase combo and destroyed counter
+		score.set(score.get() + 100 * gameStage.get() * combo.get());	// Increase score based on stage and combo
+		combo.set(combo.get() + 1);							// Increase combo and destroyed counter
 		numDest += 1;
-		if (numDest >= (gameStage * 10))	// Destroyed counter high enough calls function to increase stage
+		if (numDest >= (gameStage.get() * 10))	// Destroyed counter high enough calls function to increase stage
 			upStage();
 	}
 	
 	// Alters values when asteroid hits planet
 	public void asteroidHit() {
-		combo = 1;							// resets combo and decreases lives
-		lives--;
-		if (lives == 0)						// if lives hits zero set flag for end of game to true
+		combo.set(1);							// resets combo and decreases lives
+		lives.set(lives.get() - 1);;
+		if (lives.get() == 0)						// if lives hits zero set flag for end of game to true
 			setGameEnded(true);
 	}
 	
 	// Alters values when stage increases
 	public void upStage() {
-		score += gameStage * 1000;			// increase score based on stage
-		gameStage += 1;						// increases stage and lives, resets destroyed counter
-		lives++;
+		score.set(score.get() + gameStage.get() * 1000);			// increase score based on stage
+		gameStage.set(gameStage.get() + 1);						// increases stage and lives, resets destroyed counter
+		lives.set(lives.get() + 1);
 		numDest = 0;
 	}
 }
