@@ -5,8 +5,6 @@ import java.util.Iterator;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.NumberBinding;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -19,7 +17,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -108,10 +105,6 @@ public final class GUI {
 
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 
-		Image background = new Image("file:resources/background.jpg"); //sets background
-		Image planet = new Image("file:resources/earth.png", 150,150,true,true);      //sets planet
-		Player player = new Player(); 
-
 		theScene.setOnKeyPressed(new EventHandler<KeyEvent>() { //Used to detect button presses and store the value
 
 			public void handle(KeyEvent e)                        
@@ -145,24 +138,24 @@ public final class GUI {
 			{
 				if (GameState.getGameState().getMovingRight())   //EQUATIONS FOR MOVEMENT REQUIRED
 				{
-					player.incPosCounter();
-					player.update();
+					GameState.getGameState().getPlayer().incPosCounter();
+					GameState.getGameState().getPlayer().update();
 				}
 				if (GameState.getGameState().getMovingLeft()) //EQUATIONS FOR MOVEMENT REQUIRED
 				{
-					player.decPosCounter();
-					player.update();
+					GameState.getGameState().getPlayer().decPosCounter();
+					GameState.getGameState().getPlayer().update();
 				}
 				if (GameState.getGameState().getFiring() && GameState.getGameState().getCooldown() <= 0)
 				{   
-					GameState.getGameState().addProjectile(new Missile(player));
+					GameState.getGameState().addProjectile(new Missile(GameState.getGameState().getPlayer()));
 					GameState.getGameState().resetCooldown();
 				}
 
 				// background image clears canvas
-				gc.drawImage(background, 0, 0);     //draws the canvas
-				gc.drawImage(planet, 500-75, 500-75);    //draws the circle 
-				player.render(gc);
+				gc.drawImage(GameState.getGameState().getBackground(), 0, 0);     //draws the canvas
+				gc.drawImage(GameState.getGameState().getPlanet(), 500-75, 500-75);    //draws the circle 
+				GameState.getGameState().getPlayer().render(gc);
 				Iterator<Missile> missileIter = GameState.getGameState().getProjectilesIter();
 				while (missileIter.hasNext()) {
 					Missile missile = missileIter.next();

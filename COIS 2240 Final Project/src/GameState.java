@@ -3,25 +3,30 @@ import java.util.Iterator;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.scene.image.Image;
 
 // Lazy singleton class containing various fields and methods relation to the gamestate 
 public final class GameState {
 	private static GameState gameState = null;
 	private final long timestamp;				// unix timestamp used to determine order of equal high scores
-	private SimpleIntegerProperty score;							// current score
-	private SimpleIntegerProperty gameStage;						// score/difficulty multiplier
-	private SimpleIntegerProperty lives;							// remaining lives
-	private SimpleIntegerProperty combo;							// score multiplier
+	private SimpleIntegerProperty score;		// current score
+	private SimpleIntegerProperty gameStage;	// score/difficulty multiplier
+	private SimpleIntegerProperty lives;		// remaining lives
+	private SimpleIntegerProperty combo;		// score multiplier
 	private int numDest;						// counter for destroyed asteroids
 	private int cooldown;						// cooldown for shooting
-	private Boolean movingLeft;
-	private Boolean movingRight;
-	private Boolean firing;	
+	private Boolean movingLeft;					// flag indicating left arrow key held
+	private Boolean movingRight;				// flag indicating right arrow held
+	private Boolean firing;						// flag indicating space bar held
 	private String name;						// user's name
-	private ArrayList<Missile> missiles; // Arraylist containing all missile objects in the game at any point in time
-	private SimpleBooleanProperty gameStarted;	// flag remove start screen/load game screen
+	private final Image background; 			// background image
+	private final Image planet;      			// planet image
+	private final Player player; 				// player character
+	private final ArrayList<Missile> missiles; 		// Arraylist containing all missile objects in the game at any point in time
+	private SimpleBooleanProperty gameStarted;	// flag to remove start screen/load game screen
 	private SimpleBooleanProperty gameEnded;	// flag to remove game screen and load name entry or high scores screen
 	private SimpleBooleanProperty nameEntered;	// flag to remove name entry screen and load high scores screen
+	
 	// private constructor to initialize singleton and set base values
 	private GameState() {
 		timestamp = System.currentTimeMillis();
@@ -36,6 +41,9 @@ public final class GameState {
 		movingLeft = false;
 		movingRight = false;
 		firing = false;	
+		background = new Image("file:resources/background.jpg");
+		planet = new Image("file:resources/earth.png", 150,150,true,true);
+		player = new Player();
 		gameStarted = new SimpleBooleanProperty(false);
 		gameEnded = new SimpleBooleanProperty(false);
 		nameEntered = new SimpleBooleanProperty(false);
@@ -79,7 +87,15 @@ public final class GameState {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+	public Image getBackground() {
+		return background;
+	}
+	public Image getPlanet() {
+		return planet;
+	}
+	public Player getPlayer() {
+		return player;
+	}
 	public long getTimestamp( ) {
 		return timestamp;
 	}
