@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 // Class holding methods relating to HighScores SQLite database
+// Inspired by examples from: http://www.sqlitetutorial.net/sqlite-java/
 public final class HighScores {
 	// private constructor to prevent instantiation
 	private HighScores(){};

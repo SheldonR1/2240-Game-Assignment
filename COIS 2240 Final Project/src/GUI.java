@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -36,6 +35,7 @@ public final class GUI {
 	//private construction to prevent instantiation
 	private GUI() {
 	}
+	
 	// creates start scene
 	public static void loadStart(Scene theScene, StackPane root) {
 		root.setBackground(new Background(new BackgroundImage(new Image ("file:resources/background.jpg"), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, null, null)));	// loads/sets background image
@@ -56,7 +56,7 @@ public final class GUI {
 		lblInstruct.setTextAlignment(TextAlignment.CENTER);
 		lblInstruct.setFont(new Font(20));
 		lblInstruct.setTextFill(Color.AQUAMARINE);
-		Button btStart = new Button("Start");																// Creates/formats button and defines event for button click
+		Button btStart = new Button("Start");																// Creates/formats button to start game and defines event for button click
 		btStart.setPrefSize(200, 100);
 		btStart.setOnAction((event) -> {
 			root.getChildren().clear();																		// clears previous scene and loads game scene
@@ -68,16 +68,17 @@ public final class GUI {
 		root.getChildren().add(grid);
 	}
 
+	// Method to create and load display for score/combo/stage/lives at top of screen
 	private static void loadStatusDisplay(StackPane root) {
-		Label lblScore = new Label();
+		Label lblScore = new Label();																		// Creates labels for each status display
 		Label lblCombo = new Label();
 		Label lblStage = new Label();
 		Label lblLives = new Label();
-		lblScore.textProperty().bind(Bindings.concat("Score: ", GameState.getGameState().getScoreProperty().asString()));
+		lblScore.textProperty().bind(Bindings.concat("Score: ", GameState.getGameState().getScoreProperty().asString()));	// Binds properties for each value to corresponding label
 		lblCombo.textProperty().bind(Bindings.concat("Combo: ", GameState.getGameState().getComboProperty().asString()));
 		lblStage.textProperty().bind(Bindings.concat("Stage: ", GameState.getGameState().getGameStageProperty().asString()));
 		lblLives.textProperty().bind(Bindings.concat("Lives: ", GameState.getGameState().getLivesProperty().asString()));
-		lblScore.setFont(new Font(25));
+		lblScore.setFont(new Font(25));																		// Format label font size/colour
 		lblCombo.setFont(new Font(25));
 		lblStage.setFont(new Font(25));
 		lblLives.setFont(new Font(25));
@@ -85,44 +86,42 @@ public final class GUI {
 		lblCombo.setTextFill(Color.AQUAMARINE);
 		lblStage.setTextFill(Color.AQUAMARINE);
 		lblLives.setTextFill(Color.AQUAMARINE);
-		GridPane grid = new GridPane();
+		GridPane grid = new GridPane();																		// Create and format GridPane to space out labels and adds the to it
 		grid.getColumnConstraints().addAll(new ColumnConstraints (300), new ColumnConstraints(300), new ColumnConstraints(300));
 		grid.add(lblScore, 0, 0);
 		grid.add(lblCombo, 1, 0);
 		grid.add(lblStage, 2, 0);
 		grid.add(lblLives, 3, 0);
-		root.getChildren().add(grid);
+		root.getChildren().add(grid);																		// Adds GridPane to root
 	}
 	
-	
-
+	// Method to load and run most functions of the game
+	// Inspired by examples from: https://gamedevelopment.tutsplus.com/tutorials/introduction-to-javafx-for-game-development--cms-23835
 	public static void loadGame(Scene theScene, StackPane root) {
-		addGameListener(root);
-		Canvas canvas = new Canvas(1000, 1000);
-		root.getChildren().add(canvas);
-		loadStatusDisplay(root);
-
-		Image background = new Image("file:resources/background.jpg");
-		Image planet = new Image("file:resources/earth.png", 150,150,true,true);
-		Player player = new Player();
-		ArrayList<Missile> missiles = new ArrayList<Missile>();  // Arraylist containing all missile objects in the game at any point in time
-		ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
-
+		addGameListener(root);																				// Creates listener to end game
+		Canvas canvas = new Canvas(1000, 1000);																// Creates canvas/graphicscontexts to display the game elements 
 		GraphicsContext gc = canvas.getGraphicsContext2D();
+		root.getChildren().add(canvas);
+		loadStatusDisplay(root);																			// Creates status display bar
 
-		theScene.setOnKeyPressed(new EventHandler<KeyEvent>() { //Used to detect button presses and store the value
+		Planet planet = new Planet();																		// Creates planet object
+		Player player = new Player(planet.getPosX(), planet.getPosY());										// Creates player object
+		ArrayList<Missile> missiles = new ArrayList<Missile>();  											// Arraylist containing all missile objects in the game at any point in time
+		ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();											// Arraylist containing all asteroid objects in the game at any point in time
+
+		
+
+		theScene.setOnKeyPressed(new EventHandler<KeyEvent>() { 											// Detects key presses and sets boolean flags to true while left, right, or space are held
 			public void handle(KeyEvent e) {
 				switch (e.getCode()) {
 				case LEFT: GameState.getGameState().setMovingLeft(true); break;
 				case RIGHT: GameState.getGameState().setMovingRight(true); break;
 				case SPACE: GameState.getGameState().setFiring(true); break;
-				case UP: GameState.getGameState().asteroidDestroyed(); break;
-				case DOWN: GameState.getGameState().asteroidHit(); break;
 				default: break;
 				}
 			}
 		});
-		theScene.setOnKeyReleased(new EventHandler<KeyEvent>() { //used to detect when the button has been released
+		theScene.setOnKeyReleased(new EventHandler<KeyEvent>() { 											// sets flags to false when keys are released
 			public void handle(KeyEvent e) {
 				switch (e.getCode()) {
 				case LEFT: GameState.getGameState().setMovingLeft(false); break;
@@ -132,9 +131,12 @@ public final class GUI {
 				}
 			}
 		});
-		new AnimationTimer() {
+		new AnimationTimer() {																				// Main game loop
+			int asteroidCooldown = 0;																		// counters to control cooldown for missile firing/asteroid spawning
+			int missileCooldown = 0;
 			public void handle(long currentNanoTime) {
-				if (GameState.getGameState().getMovingRight()) {
+				gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());									// Clears canvas
+				if (GameState.getGameState().getMovingRight()) {											// Updates position of player/ renders based on if left/right arrows are held
 					player.incPosCounter();
 					player.update();
 				}
@@ -142,65 +144,66 @@ public final class GUI {
 					player.decPosCounter();
 					player.update();
 				}
-				if (GameState.getGameState().getFiring() && GameState.getGameState().getMissileCooldown() <= 0) {   
-					missiles.add(new Missile(player));
-					GameState.getGameState().resetMissileCooldown();
+				if (GameState.getGameState().getFiring() && missileCooldown <= 0) {   						// Creates new missile if spacebar is held and missiles not on cooldown
+					missiles.add(new Missile(player, planet));
+					missileCooldown = 50;
 				}
-				if (GameState.getGameState().getAsteroidCooldown() <= 0) {
+				if (asteroidCooldown <= 0) {																// If asteroid spawner not on cooldown, creates a new asteroid and resets cooldown, decreasing with game stage
 					asteroids.add(new Asteroid());
-					GameState.getGameState().resetAsteroidCooldown();
+					asteroidCooldown = (int)(150 - 40 * Math.log(GameState.getGameState().getGameStage()));
 				}
-				// background image clears canvas
-				gc.drawImage(background, 0, 0);     //draws the canvas
-				gc.drawImage(planet, 500-75, 500-75);    //draws the circle 
-				player.render(gc);
-				
-				updateMissiles(gc, missiles.iterator());
-				updateAsteroids(gc, asteroids.iterator());
-				checkCollisions(missiles.iterator(), asteroids.iterator());
-				
-				
-				GameState.getGameState().decMissileCooldown();
-				GameState.getGameState().decAsteroidCooldown();
+				planet.render(gc);    																		// renders the planet 
+				player.render(gc);																			// renders the player
+				checkCollisions(missiles.iterator(), asteroids.iterator());									// Checks for collisions between asteroids and missiles
+				updateMissiles(gc, missiles.iterator());													// Updates/redraws missiles and removes them if they have left screen
+				updateAsteroids(gc, asteroids.iterator(), planet, player);									// Updates/redraws asteroids and removes them if they have left screen or hit planet/player
+				if (missileCooldown > 0)																	// decreases cooldowns for missile/asteroid 
+					missileCooldown--;
+				if (asteroidCooldown > 0)
+					asteroidCooldown--;
+				if (GameState.getGameState().gameEndedProperty().getValue() == true)						// stops game loop when end flag has been set to true
+					this.stop();
 			}
 		}.start();
 	}
 	
+	// Method to update position and redraw missiles as well as check removal conditions
 	private static void updateMissiles(GraphicsContext gc, Iterator<Missile> missileIter) {
-		while (missileIter.hasNext()) {
+		while (missileIter.hasNext()) {																		// Iterator for missile ArrayList
 			Missile missile = missileIter.next();
-			missile.render(gc);
-			if (missile.getPositionX() > 1000 || missile.getPositionY() > 1000 || missile.getPositionX() < 0 || missile.getPositionY() < 0)
+			missile.render(gc);																				// Updates position/draws each missile
+			if (missile.getPosX() > 1000 || missile.getPosY() > 1000 || missile.getPosX() < 0 || missile.getPosY() < 0)	// Checks if any missile has hit egdes of screen and removes it
 				missileIter.remove();
 		}
 	}
 	
-	private static void updateAsteroids(GraphicsContext gc, Iterator<Asteroid> asteroidIter) {
-		while (asteroidIter.hasNext()) {
+	// Method to update position and redraw asteroid as well as check removal conditions
+	private static void updateAsteroids(GraphicsContext gc, Iterator<Asteroid> asteroidIter, Planet planet, Player player) {
+		while (asteroidIter.hasNext()) {																	// Iterator for asteroid Arraylist
 			Asteroid asteroid = asteroidIter.next();
-			asteroid.render(gc);
-			if (asteroid.getPositionX() <= 575 && asteroid.getPositionX() >= 425 && asteroid.getPositionY() <= 575 && asteroid.getPositionY() >= 425) {
+			asteroid.render(gc);																			// Updates position/draws each asteroid
+			if (asteroid.intersects(planet) || asteroid.intersects(player)) {								// Checks if any asteroid has hit planet or player and deletes it/ updates GameState accordingly
 				asteroidIter.remove();
 				GameState.getGameState().asteroidHit();
-			} else if (asteroid.getPositionX() > 1000 || asteroid.getPositionY() > 1000 || asteroid.getPositionX() < 0 || asteroid.getPositionY() < 0) {
+			} else if (asteroid.getPosX() > 1000 || asteroid.getPosY() > 1000 || asteroid.getPosX() < 0 || asteroid.getPosY() < 0) {	// Checks if any asteroid has hit edges of screen and removes it
 				asteroidIter.remove();
 			}
 		}
 	}
 
+	// Method to check for collisions between asteroids and missiles. Takes iterator for corresponding ArrayLists and removes elements from both that collide
 	private static void checkCollisions(Iterator<Missile> missileIter, Iterator<Asteroid> asteroidIter) {
-		while (missileIter.hasNext()) {
-			Missile missile = missileIter.next();
-			while (asteroidIter.hasNext()) {
+			while (asteroidIter.hasNext()) {																// Iterator for asteroid ArrayList
 				Asteroid asteroid = asteroidIter.next();
-
-				if(missile.intersects(asteroid)) {
-					asteroidIter.remove();
+				while (missileIter.hasNext()) {																// Iterator for missile ArrayList
+					Missile missile = missileIter.next();
+				if(asteroid.intersects(missile)) {															// Checks for collision between each asteroid and missile
+					asteroidIter.remove();																	// Removes both objects when collision is detected, then updates GameState accordingly
 					missileIter.remove();
 					GameState.getGameState().asteroidDestroyed();
 				}
 			}
-		}
+		} 
 	}
 
 	// creates scene to get user to enter name
@@ -269,14 +272,14 @@ public final class GUI {
 		lblName.setFont(new Font(25));
 		lblScore.setFont(new Font(25));
 		if (newScore == true) {																				// Sets font colour depending on whether score was new
-			lblPos.setTextFill(Color.DARKRED);
-			lblName.setTextFill(Color.DARKRED);
-			lblScore.setTextFill(Color.DARKRED);
-		}
-		else {
 			lblPos.setTextFill(Color.CHARTREUSE);
 			lblName.setTextFill(Color.CHARTREUSE);
 			lblScore.setTextFill(Color.CHARTREUSE);
+		}
+		else {
+			lblPos.setTextFill(Color.CYAN);
+			lblName.setTextFill(Color.CYAN);
+			lblScore.setTextFill(Color.CYAN);
 		}
 		ArrayList<Label> scoreLabels = new ArrayList<Label>();												// loads labels into new ArrayList and returns them
 		Collections.addAll(scoreLabels, lblPos, lblName, lblScore);
