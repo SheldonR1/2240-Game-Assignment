@@ -12,10 +12,10 @@ import java.util.Collections;
 public final class HighScores {
 	// private constructor to prevent instantiation
 	private HighScores(){};
-	
+
 	// attempts to connect to database/table and recreates them if they are not found
 	public static void checkDatabase() {
-		String url = "jdbc:sqlite:/toast/HighScores.db";																// url of database
+		String url = "jdbc:sqlite:HighScores.db";																// url of database
 		String sql = "CREATE TABLE IF NOT EXISTS high_scores (name text, score integer, timestamp integer);";	// sql code to create a new table if one is not found
 		try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
 				Statement smt = conn.createStatement()) {

@@ -1,3 +1,5 @@
+// Background image source: https://upload.wikimedia.org/wikipedia/commons/1/13/Stars_Galaxy_Rocky_Mountain_%28Unsplash%29.jpg
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -43,11 +45,11 @@ public final class GUI {
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(5, 5, 5, 5));
-		grid.getColumnConstraints().addAll(new ColumnConstraints (100), new ColumnConstraints(175), new ColumnConstraints(100), new ColumnConstraints(500));
+		grid.getColumnConstraints().addAll(new ColumnConstraints (100), new ColumnConstraints(75), new ColumnConstraints(200), new ColumnConstraints(500));
 		grid.getRowConstraints().addAll(new RowConstraints(300),  new RowConstraints(75), new RowConstraints(200));
-		Label lblTitle = new Label("Game Title");															// Creates and formats labels to display title/instructions
+		Label lblTitle = new Label("Tesla Defence");															// Creates and formats labels to display title/instructions
 		lblTitle.setFont(new Font(100));
-		lblTitle.setTextFill(Color.DARKRED);
+		lblTitle.setTextFill(Color.RED);
 		Label lblInstruct = new Label("How to Play: \n"
 				+ "The object of this game is to defend the planet by shooting meteors before they make contact\n"
 				+ "Use the mouse to aim and left click to fire\n"
@@ -55,15 +57,17 @@ public final class GUI {
 				+ "If the planet gets hit to many times the game will end");
 		lblInstruct.setTextAlignment(TextAlignment.CENTER);
 		lblInstruct.setFont(new Font(20));
-		lblInstruct.setTextFill(Color.AQUAMARINE);
+		lblInstruct.setTextFill(Color.CHARTREUSE);
 		Button btStart = new Button("Start");																// Creates/formats button to start game and defines event for button click
 		btStart.setPrefSize(200, 100);
+		btStart.setFont(new Font(40));
+		btStart.setTextFill(Color.DARKGREEN);
 		btStart.setOnAction((event) -> {
 			root.getChildren().clear();																		// clears previous scene and loads game scene
 			loadGame(theScene, root);
 		});
 		grid.add(lblTitle, 2, 1, 3, 1);																		// Loads elements into GridPane and adds GridPane to root to display
-		grid.add(lblInstruct, 1, 2, 5, 1);
+		grid.add(lblInstruct, 1, 2, 10, 1);
 		grid.add(btStart, 3, 3, 3, 3);
 		root.getChildren().add(grid);
 	}
@@ -82,10 +86,10 @@ public final class GUI {
 		lblCombo.setFont(new Font(25));
 		lblStage.setFont(new Font(25));
 		lblLives.setFont(new Font(25));
-		lblScore.setTextFill(Color.AQUAMARINE);
-		lblCombo.setTextFill(Color.AQUAMARINE);
-		lblStage.setTextFill(Color.AQUAMARINE);
-		lblLives.setTextFill(Color.AQUAMARINE);
+		lblScore.setTextFill(Color.CHARTREUSE);
+		lblCombo.setTextFill(Color.CHARTREUSE);
+		lblStage.setTextFill(Color.CHARTREUSE);
+		lblLives.setTextFill(Color.CHARTREUSE);
 		GridPane grid = new GridPane();																		// Create and format GridPane to space out labels and adds the to it
 		grid.getColumnConstraints().addAll(new ColumnConstraints (300), new ColumnConstraints(300), new ColumnConstraints(300));
 		grid.add(lblScore, 0, 0);
@@ -217,9 +221,10 @@ public final class GUI {
 		Label lblHighScoreMsg = new Label("New High Score");												// Creates and formats labels for scene
 		lblHighScoreMsg.setFont(new Font(40));
 		Label lblNamePrompt = new Label("Enter Name: ");
+		lblNamePrompt.setFont(new Font(20));
 		Label lblInvalidName = new Label("Name must be 2-15 characters");
-		lblHighScoreMsg.setTextFill(Color.AQUAMARINE);
-		lblNamePrompt.setTextFill(Color.AQUAMARINE);
+		lblHighScoreMsg.setTextFill(Color.CHARTREUSE);
+		lblNamePrompt.setTextFill(Color.CHARTREUSE);
 		lblInvalidName.setTextFill(Color.RED);
 		lblInvalidName.setVisible(false);
 		TextField tfName = new TextField();															// Creates text field for name entry and defines event for pressing enter
@@ -245,21 +250,24 @@ public final class GUI {
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(5, 5, 5, 5));
-		grid.getColumnConstraints().addAll(new ColumnConstraints (400), new ColumnConstraints(30), new ColumnConstraints(250), new ColumnConstraints(100), new ColumnConstraints (400));
+		grid.getColumnConstraints().addAll(new ColumnConstraints (400), new ColumnConstraints(30), new ColumnConstraints(100), new ColumnConstraints(150), new ColumnConstraints(100), new ColumnConstraints (400));
 		grid.getRowConstraints().addAll(new RowConstraints(300), new RowConstraints(25), new RowConstraints(25), new RowConstraints(25), new RowConstraints(25), new RowConstraints(25), new RowConstraints(25), new RowConstraints(25), new RowConstraints(25), new RowConstraints(25), new RowConstraints(25), new RowConstraints(200));
 		ArrayList<ArrayList<Object>> highScoreList = HighScores.getHighScoreList();							// gets scores from database loaded into 2D ArrayList
 		ArrayList<Label> scoreLabels;
 		for(int i = 0; i < highScoreList.size(); i++) {														// converts score data from ArrayList into labels and adds them to GridPane
 			scoreLabels = getScoreLabels(String.valueOf(i+1), String.valueOf(highScoreList.get(i).get(0)), String.valueOf(highScoreList.get(i).get(1)), (highScoreList.get(i).get(2).equals(GameState.getGameState().getTimestamp())));
 			grid.add(scoreLabels.get(0), 1, i+1);
-			grid.add(scoreLabels.get(1), 2, i+1);
-			grid.add(scoreLabels.get(2), 3, i+1);
+			grid.add(scoreLabels.get(1), 2, i+1, 2, 1);
+			grid.add(scoreLabels.get(2), 4, i+1);
 		}
 		Button btExit = new Button("Exit");																// creates button to exit program
+		btExit.setTextFill(Color.DARKRED);
+		btExit.setPrefSize(140, 70);
+		btExit.setFont(new Font(30));
 		btExit.setOnAction((event) -> {
 			Platform.exit();
 		});
-		grid.add(btExit, 4, 11);
+		grid.add(btExit, 3, 11, 10, 10);
 		root.getChildren().add(grid);																		// adds GridPane to root to display
 	}
 	
@@ -272,14 +280,14 @@ public final class GUI {
 		lblName.setFont(new Font(25));
 		lblScore.setFont(new Font(25));
 		if (newScore == true) {																				// Sets font colour depending on whether score was new
+			lblPos.setTextFill(Color.RED);
+			lblName.setTextFill(Color.RED);
+			lblScore.setTextFill(Color.RED);
+		}
+		else {
 			lblPos.setTextFill(Color.CHARTREUSE);
 			lblName.setTextFill(Color.CHARTREUSE);
 			lblScore.setTextFill(Color.CHARTREUSE);
-		}
-		else {
-			lblPos.setTextFill(Color.CYAN);
-			lblName.setTextFill(Color.CYAN);
-			lblScore.setTextFill(Color.CYAN);
 		}
 		ArrayList<Label> scoreLabels = new ArrayList<Label>();												// loads labels into new ArrayList and returns them
 		Collections.addAll(scoreLabels, lblPos, lblName, lblScore);

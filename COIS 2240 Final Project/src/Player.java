@@ -1,6 +1,10 @@
+// Sprite image source: https://openclipart.org/detail/61201/red-racing-car-top-view
+
 import javafx.scene.image.Image;
 import javafx.geometry.*;
 import javafx.scene.canvas.GraphicsContext;
+
+
 
 // contains methods to create and manage player character
 public class Player {

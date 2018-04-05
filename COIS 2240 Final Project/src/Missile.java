@@ -1,3 +1,5 @@
+// sprite image source: https://www.krohom.com/new-wp-content/uploads/2018/01/Tesla_symbol.svg_.png
+
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -15,8 +17,8 @@ public class Missile {
 	public Missile(double playerX, double playerY, double planetX, double planetY) {  
 		posX = playerX;											// Sets x and y coordinates to player position
 		posY = playerY;
-		width = 20;															// sets width/height
-		height = 20;
+		width = 30;															// sets width/height
+		height = 30;
 		sprite = new Image("file:resources/bullet.png", width, height,true,true);	// loads sprite with dimensions given previously
 		velX = (posX - planetX)/50;								// determines velocity based on position compared to planet
 		velY = (posY - planetY)/50;

@@ -1,3 +1,5 @@
+// sprite image source: https://apod.nasa.gov/apod/image/0304/bluemarble2k_big.jpg
+
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
