@@ -158,7 +158,7 @@ public final class GUI {
 				}
 				planet.render(gc);    																		// renders the planet 
 				player.render(gc);																			// renders the player
-				checkCollisions(missiles.iterator(), asteroids.iterator());									// Checks for collisions between asteroids and missiles
+				checkCollisions(missiles, asteroids.iterator());									// Checks for collisions between asteroids and missiles
 				updateMissiles(gc, missiles.iterator());													// Updates/redraws missiles and removes them if they have left screen
 				updateAsteroids(gc, asteroids.iterator(), planet, player);									// Updates/redraws asteroids and removes them if they have left screen or hit planet/player
 				if (missileCooldown > 0)																	// decreases cooldowns for missile/asteroid 
@@ -196,11 +196,15 @@ public final class GUI {
 	}
 
 	// Method to check for collisions between asteroids and missiles. Takes iterator for corresponding ArrayLists and removes elements from both that collide
-	private static void checkCollisions(Iterator<Missile> missileIter, Iterator<Asteroid> asteroidIter) {
-			while (asteroidIter.hasNext()) {																// Iterator for asteroid ArrayList
-				Asteroid asteroid = asteroidIter.next();
-				while (missileIter.hasNext()) {																// Iterator for missile ArrayList
-					Missile missile = missileIter.next();
+	private static void checkCollisions(ArrayList<Missile> missiles, Iterator<Asteroid> asteroidIter) {
+		Asteroid asteroid;
+		Missile missile;
+		Iterator<Missile> missileIter;
+		while (asteroidIter.hasNext()) {																// Iterator for asteroid ArrayList
+			asteroid = asteroidIter.next();
+			missileIter = missiles.iterator();
+			while (missileIter.hasNext()) {																// Iterator for missile ArrayList
+				missile = missileIter.next();
 				if(asteroid.intersects(missile)) {															// Checks for collision between each asteroid and missile
 					asteroidIter.remove();																	// Removes both objects when collision is detected, then updates GameState accordingly
 					missileIter.remove();
