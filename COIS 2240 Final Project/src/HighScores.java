@@ -15,13 +15,13 @@ public final class HighScores {
 	
 	// attempts to connect to database/table and recreates them if they are not found
 	public static void checkDatabase() {
-		String url = "jdbc:sqlite:HighScores.db";																// url of database
+		String url = "jdbc:sqlite:/toast/HighScores.db";																// url of database
 		String sql = "CREATE TABLE IF NOT EXISTS high_scores (name text, score integer, timestamp integer);";	// sql code to create a new table if one is not found
 		try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
 				Statement smt = conn.createStatement()) {
 			smt.executeUpdate(sql);
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			System.out.println("Failed to connect to database");
 		}
 	}
 
@@ -36,7 +36,7 @@ public final class HighScores {
 			ps.setLong(3, timestamp);
 			ps.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			System.out.println("Failed to add high score to database");
 		}
 	}
 
@@ -48,13 +48,12 @@ public final class HighScores {
 				Statement smt = conn.createStatement()) {
 			smt.executeUpdate(sql);
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			System.out.println("Failed to remove high score from database");
 		}
 	}
 
 	// Checks if 10 high scores saved and returns false if not
 	public static boolean enoughHighScores() {
-
 		String url = "jdbc:sqlite:HighScores.db";																// url of database
 		String sql = "SELECT COUNT(*) FROM high_scores";														// sql code to determine number of high scores stored in table
 		try (Connection conn = DriverManager.getConnection(url);												// connect to database and execute sql code
@@ -65,7 +64,7 @@ public final class HighScores {
 					return false;
 			}
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			System.out.println("Failed evaluate number of high scores in database");
 		}
 		return true;																							// returns true otherwise
 	}
@@ -82,7 +81,7 @@ public final class HighScores {
 					return true;
 			}
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			System.out.println("Failed to compare score to scores in database");
 		}
 		return false;																							// returns false otherwise
 	}
@@ -101,7 +100,7 @@ public final class HighScores {
 				highScoresList.add(score);
 			}
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			System.out.println("Failed load high scores from database");
 		}
 		return highScoresList;																					// returns scores;
 	}
