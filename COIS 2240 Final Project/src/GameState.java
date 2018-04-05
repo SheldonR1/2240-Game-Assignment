@@ -134,7 +134,7 @@ public final class GameState {
 	}
 
 	// Alters values when stage increases
-	public void upStage() {
+	private void upStage() {
 		score.set(score.get() + gameStage.get() * 1000);				// increase score based on stage
 		gameStage.set(gameStage.get() + 1);								// increases stage and lives, resets destroyed counter
 		lives.set(lives.get() + 1);
