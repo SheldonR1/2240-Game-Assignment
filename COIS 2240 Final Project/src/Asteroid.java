@@ -65,7 +65,7 @@ public class Asteroid {
 	}
 
 	// adjusts position based on velocity
-	public void update() {
+	private void update() {
 		posX += velX;
 		posY += velY;
 	}

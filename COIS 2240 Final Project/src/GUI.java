@@ -97,7 +97,7 @@ public final class GUI {
 	
 	// Method to load and run most functions of the game
 	// Inspired by examples from: https://gamedevelopment.tutsplus.com/tutorials/introduction-to-javafx-for-game-development--cms-23835
-	public static void loadGame(Scene theScene, StackPane root) {
+	private static void loadGame(Scene theScene, StackPane root) {
 		addGameListener(root);																				// Creates listener to end game
 		Canvas canvas = new Canvas(1000, 1000);																// Creates canvas/graphicscontexts to display the game elements 
 		GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -145,7 +145,7 @@ public final class GUI {
 					player.update();
 				}
 				if (GameState.getGameState().getFiring() && missileCooldown <= 0) {   						// Creates new missile if spacebar is held and missiles not on cooldown
-					missiles.add(new Missile(player, planet));
+					missiles.add(new Missile(player.getPosX(), player.getPosY(), planet.getPosX(), planet.getPosY()));
 					missileCooldown = 50;
 				}
 				if (asteroidCooldown <= 0) {																// If asteroid spawner not on cooldown, creates a new asteroid and resets cooldown, decreasing with game stage

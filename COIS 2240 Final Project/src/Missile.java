@@ -12,14 +12,14 @@ public class Missile {
 	double velX;					// x and y velocity components
 	double velY;
 
-	public Missile(Player player, Planet planet) {  
-		posX = player.getPosX();											// Sets x and y coordinates to player position
-		posY = player.getPosY();
+	public Missile(double playerX, double playerY, double planetX, double planetY) {  
+		posX = playerX;											// Sets x and y coordinates to player position
+		posY = playerY;
 		width = 20;															// sets width/height
 		height = 20;
 		sprite = new Image("file:resources/bullet.png", width, height,true,true);	// loads sprite with dimensions given previously
-		velX = (posX - planet.getPosX())/50;								// determines velocity based on position compared to planet
-		velY = (posY - planet.getPosY())/50;
+		velX = (posX - planetX)/50;								// determines velocity based on position compared to planet
+		velY = (posY - planetY)/50;
 		width = sprite.getWidth();											// determines width/height based on dimensions given for image earlier
 		height = sprite.getHeight();
 	}
@@ -32,7 +32,7 @@ public class Missile {
 	}
 
 	// adjusts x and y coords based on velocity 
-	public void update() {
+	private void update() {
 		posX += velX;
 		posY += velY;
 	}
