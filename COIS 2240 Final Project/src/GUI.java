@@ -222,17 +222,17 @@ public final class GUI {
 		lblNamePrompt.setTextFill(Color.AQUAMARINE);
 		lblInvalidName.setTextFill(Color.RED);
 		lblInvalidName.setVisible(false);
-		TextField nameTextField = new TextField();															// Creates text field for name entry and defines event for pressing enter
-		nameTextField.setOnAction((event) -> {
-			if ((nameTextField.getText().length() > 15) || (nameTextField.getText().length() < 2)) {		// If name too long or short displays message
+		TextField tfName = new TextField();															// Creates text field for name entry and defines event for pressing enter
+		tfName.setOnAction((event) -> {
+			if ((tfName.getText().length() > 15) || (tfName.getText().length() < 2)) {		// If name too long or short displays message
 				lblInvalidName.setVisible(true);
 			} else {																						// If name valid saves it and sets nameEntered flag to true for scene transition
-				GameState.getGameState().setName(nameTextField.getText());
+				GameState.getGameState().setName(tfName.getText());
 				GameState.getGameState().setNameEntered(true);
 			}
 		});
 		HBox hBox = new HBox();																				// Adds all elements to GridPane then adds GridPane to root for display
-		hBox.getChildren().addAll(lblNamePrompt, nameTextField);
+		hBox.getChildren().addAll(lblNamePrompt, tfName);
 		grid.add(lblHighScoreMsg, 0, 0);
 		grid.add(hBox, 0, 3);
 		grid.add(lblInvalidName, 0, 5);
@@ -255,11 +255,11 @@ public final class GUI {
 			grid.add(scoreLabels.get(1), 2, i+1);
 			grid.add(scoreLabels.get(2), 3, i+1);
 		}
-		Button exitButton = new Button("Exit");																// creates button to exit program
-		exitButton.setOnAction((event) -> {
+		Button btExit = new Button("Exit");																// creates button to exit program
+		btExit.setOnAction((event) -> {
 			Platform.exit();
 		});
-		grid.add(exitButton, 4, 11);
+		grid.add(btExit, 4, 11);
 		root.getChildren().add(grid);																		// adds GridPane to root to display
 	}
 	
