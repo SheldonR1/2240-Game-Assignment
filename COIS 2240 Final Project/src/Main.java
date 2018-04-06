@@ -16,7 +16,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception{						
 		HighScores.checkDatabase();					// Checks to see if database/highscres table exist and creates them if not found
-		primaryStage.setTitle("Toast");				// Set stage title
+		primaryStage.setTitle("Tesla Defense");				// Set stage title
 		primaryStage.setResizable(false);			// fix stage size
 		StackPane root = new StackPane();			// creates root StackPane and defines size
 		root.setPrefSize(1000, 1000);
