@@ -118,7 +118,7 @@ public final class GameState {
 
 	// Alter values when player destroys an asteroid
 	public void asteroidDestroyed() {
-		score.set(score.get() + 100 * gameStage.get() * combo.get());	// Increase score based on stage and combo
+		score.set(score.get() + 100 * gameStage.get() + 50 * combo.get());	// Increase score based on stage and combo
 		combo.set(combo.get() + 1);										// Increase combo and destroyed counter
 		numDest += 1;
 		if (numDest >= (gameStage.get() * 5))							// Destroyed counter high enough calls function to increase stage
@@ -135,7 +135,7 @@ public final class GameState {
 
 	// Alters values when stage increases
 	private void upStage() {
-		score.set(score.get() + gameStage.get() * 1000);				// increase score based on stage
+		score.set(score.get() + gameStage.get() * 500);					// increase score based on stage
 		gameStage.set(gameStage.get() + 1);								// increases stage and lives, resets destroyed counter
 		lives.set(lives.get() + 1);
 		numDest = 0;
